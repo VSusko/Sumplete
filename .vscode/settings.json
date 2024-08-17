@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "jogo.h": "c",
+        "tabuleiro.h": "c",
+        "time.h": "c",
+        "dbg.h": "c",
+        "auxiliares.h": "c",
+        "ui.h": "c"
+    }
+}

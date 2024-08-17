@@ -97,7 +97,7 @@
             player.tempo = end - begin;
         }
 
-        char nomesave[MAX]; //string que conterá o nome do save do jogador
+        char nomesave[MAX_STRING]; //string que conterá o nome do save do jogador
         int i = 0, manterCount = 0, removerCount = 0;
         do
         {
@@ -227,16 +227,16 @@
 
     void Voltar(InfoTabuleiro *tabuleiro, int*** gabarito, int **BackEnding, int *acao)
     {
-        char comando[MAX];
+        char comando[MAX_STRING];
         int op;
         Menu();
-        fgets(comando, MAX, stdin);
+        fgets(comando, MAX_STRING, stdin);
         op = comando[0] - '0';
 
         while(op < 0 || op > 4 || comando[1] != '\n')
         {
             printf(RED("\n\nComando inválido! Digite um número de 0 a 4: "));
-            fgets(comando, MAX, stdin);
+            fgets(comando, MAX_STRING, stdin);
             op = comando[0] - '0';
         }
         

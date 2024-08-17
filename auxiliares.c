@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "auxiliares.h"
 #include "jogo.h"
 

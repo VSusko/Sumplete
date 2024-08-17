@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include "jogo.h"
-#include "cores.h"
+#include "ui.h"
 
     void Resolver(InfoTabuleiro, Jogadores, int***, int**, time_t);
         

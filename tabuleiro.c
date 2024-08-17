@@ -1,10 +1,5 @@
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
 #include "tabuleiro.h"
-#include "cores.h"
 #include "jogo.h"
 
     //Função que imprime os comandos do jogo
@@ -223,25 +218,7 @@
 
             //Imprimindo o ranking no terminal - cabeçalho
 
-            printf(TAB_TL);
-            for(int i = 0; i < 23; i++)
-            {
-                if(i % 2 == 0)
-                    printf(MAGENTA(TAB_HOR));
-                else
-                    printf(TAB_HOR);
-            }
-            printf(TAB_TR"\n");
-            printf(TAB_VER BLUE(" RANKING DOS JOGADORES ") TAB_VER);
-            printf("\n"TAB_BL);
-            for(int i = 0; i < 23; i++)
-            {
-                if(i % 2 == 0)
-                    printf(MAGENTA(TAB_HOR));
-                else
-                    printf(TAB_HOR);
-            }
-            printf(TAB_BR"\n\n");
+            ImprimirRankingHeader();
 
             //imprimindo ranking no terminal - ranking
 
@@ -315,7 +292,7 @@
 
     void MenuJogarNovamente(int *acao)
     {
-      char comando[MAX];
+      char comando[MAX_STRING];
 
       printf(YELLOW("\nDeseja jogar novamente?"));
       printf(YELLOW("\nDigite "));
@@ -324,7 +301,7 @@
       printf(RED("0"));
       printf(YELLOW(" para sair do jogo:\n\n"));
       
-      fgets(comando, MAX, stdin);
+      fgets(comando, MAX_STRING, stdin);
       int op = comando[0] - '0';
 
       while((op != 0 && op != 1) || comando[1] != '\n')
@@ -336,7 +313,7 @@
         printf(YELLOW(" para jogar novamente ou "));
         printf(RED("0"));
         printf(YELLOW(" para sair do jogo:\n\n"));
-        fgets(comando, MAX, stdin);
+        fgets(comando, MAX_STRING, stdin);
         op = comando[0] - '0';
       }
 
@@ -349,7 +326,7 @@
       else if (op == 1)
       {
         Menu();
-        fgets(comando, MAX, stdin);
+        fgets(comando, MAX_STRING, stdin);
         *acao = comando[0] - '0';
 
         while(*acao < 0 || *acao > 4 || comando[1] != '\n')
@@ -365,7 +342,7 @@
 
     void ImprimirAcao3(int *acao)
     {
-      char comando[MAX];
+      char comando[MAX_STRING];
 
       printf("\n\nVocê ainda ");
       printf(RED("não"));
@@ -382,7 +359,7 @@
       printf(YELLOW("\n\nDurante o jogo digite "));  
       printf(RED("“voltar”"));  
       printf(YELLOW(" para retornar ao menu.\n\n"));  
-      fgets(comando, MAX, stdin);
+      fgets(comando, MAX_STRING, stdin);
       int op = comando[0] - '0';
 
       while(comando[1] != '\n' || op < 0 || op > 4 || op == 3)
@@ -392,7 +369,7 @@
         else if(op == 3)
         printf(RED("\nVocê ainda não começou nenhum jogo. Selecione uma das opções mostradas: "));
 
-        fgets(comando, MAX, stdin);
+        fgets(comando, MAX_STRING, stdin);
         op = comando[0] - '0';
       }
     
@@ -420,7 +397,7 @@
 
     void ImprimirAcao4(int *acao)
     {
-      char comando[MAX];
+      char comando[MAX_STRING];
 
       printf("\n\n");
       ImprimirRanking();
@@ -436,12 +413,63 @@
       printf(YELLOW("\n\nDurante o jogo digite "));  
       printf(RED("“voltar”"));  
       printf(YELLOW(" para retornar ao menu.\n\n"));  
-      fgets(comando, MAX, stdin);
+      fgets(comando, MAX_STRING, stdin);
       *acao = comando[0] - '0';
       while(comando[1] != '\n' || *acao < 0 || *acao > 4)
       {
         printf(RED("\n\nComando inválido!\n\n"));
-        fgets(comando, MAX, stdin);
+        fgets(comando, MAX_STRING, stdin);
         *acao = comando[0] - '0';
       }
+    }
+
+
+    void ImprimirRankingHeader()
+    {
+      printf("\t"TAB_TL);
+      for(int i = 0; i < 23; i++)
+      {
+          if(i % 2 == 0)
+              printf(MAGENTA(TAB_HOR));
+          else
+              printf(TAB_HOR);
+      }
+      printf(TAB_TR"\n");
+      printf("\t"TAB_VER BLUE(" RANKING DOS JOGADORES ") TAB_VER);
+      printf("\n\t"TAB_BL);
+      for(int i = 0; i < 23; i++)
+      {
+          if(i % 2 == 0)
+              printf(MAGENTA(TAB_HOR));
+          else
+              printf(TAB_HOR);
+      }
+      printf(TAB_BR"\n");
+    }
+
+    void ImprimirRankingBody(RankingBuilder _r_builder, Jogadores _player)
+    {
+      for(int i = 0; i < NUM_TABULEIROS; i++)
+      {
+        //Caso não tenha jogadores numa categoria, pular para a próxima
+        if(_r_builder.jogadores_por_categoria[i] == 0)
+          continue;
+
+        printf(_PURPLE("\nsize = %d\n"), i+3);
+        for(int j = 0; j < _r_builder.jogadores_por_categoria[i]; j++)
+        {
+          if(jogadoresSaoIguais(_player, _r_builder.ranking[i][j]))
+          {
+            printf(_CYAN("SUA COLOCAÇÃO:\n"));
+            printf(_CYAN("player%d = %s\n"), j+1, _r_builder.ranking[i][j].nome);
+            printf(_CYAN("time%d = %ld\n"), j+1, _r_builder.ranking[i][j].tempo);
+          }
+          else
+          {
+            printf(_LIGHT_PURPLE("player%d = %s\n"), j+1, _r_builder.ranking[i][j].nome);
+            printf(_LIGHT_PURPLE("time%d = %ld\n"), j+1, _r_builder.ranking[i][j].tempo);
+          }
+        }
+      }
+
     }

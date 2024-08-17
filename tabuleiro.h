@@ -1,8 +1,7 @@
-# ifndef tabuleiro_h
-# define tabuleiro_h
+#ifndef tabuleiro_h
+#define tabuleiro_h
 
-#include <stdio.h>
-#include "jogo.h"
+#include "auxiliares.h"
 
     void Menu();
 
@@ -20,4 +19,8 @@
 
     void ImprimirAcao4(int*);
 
-# endif
+    void ImprimirRankingHeader();
+
+    void ImprimirRankingBody(RankingBuilder, Jogadores);
+
+#endif

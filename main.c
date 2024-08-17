@@ -1,17 +1,14 @@
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <time.h>
-#include "tabuleiro.h"
-#include "cores.h"
 #include "jogo.h"
 #include "auxiliares.h"
 #include "comandos.h"
+#include "tabuleiro.h"
+#include "dbg.h"
+
 
     int main()
     {
-        char comando[MAX], dificuldade; //string que será utilizada ao longo de todo o codigo para receber comandos
+        char comando[MAX_STRING], dificuldade; //string que será utilizada ao longo de todo o codigo para receber comandos
         int **gabarito;
         int conta1 = 0; //variável que conta quantos elementos serão mantidos no jogo -> utilidade na função de dica
         int acao = 0; //variavel que irá fazer os comandos do Menu
@@ -20,7 +17,7 @@
         Jogadores player; 
 
         Menu();
-        fgets(comando, MAX, stdin);
+        fgets(comando, MAX_STRING, stdin);
         acao = comando[0] - '0';
         
         while(acao < 0 || acao > 4 || comando[1] != '\n')
@@ -43,16 +40,27 @@
 
                 fflush(stdin); //Função que limpa o buffer
                 
-                player = ColetarDadosJogador(player); //Entrada do nome do jogador
-                tabuleiro = ColetarDadosJogo(tabuleiro, comando, &dificuldade); //Entrada de dados do jogo
+                #if DEBUG
 
-                tabuleiro = criaJogo(tabuleiro, &gabarito, dificuldade);
+                  strcpy(player.nome,"SUQUINHO");
+                
+                  tabuleiro.tamanho = 5;
+                  dificuldade = 'f';
+                  
+                #else
 
-                int **BackEnding; //Matriz que será manipulada
-                criaMatriz(&BackEnding, tabuleiro.tamanho);
-                BackEnding = iniciaMatrizBackEnding(tabuleiro, BackEnding, gabarito, &conta1);
+                  player = ColetarDadosJogador(player); //Entrada do nome do jogador
+                  tabuleiro = ColetarDadosJogo(tabuleiro, comando, &dificuldade); //Entrada de dados do jogo
 
-                player.tamanho = tabuleiro.tamanho;
+                #endif
+
+                  tabuleiro = criaJogo(tabuleiro, &gabarito, dificuldade);
+                  int **BackEnding; //Matriz que será manipulada
+                  criaMatriz(&BackEnding, tabuleiro.tamanho);
+                  BackEnding = iniciaMatrizBackEnding(tabuleiro, BackEnding, gabarito, &conta1);
+
+                  player.tamanho = tabuleiro.tamanho;
+
                 
                 ImprimeTabuleiro(tabuleiro, BackEnding);
 
@@ -60,7 +68,7 @@
 
                 while(Comparador(tabuleiro, gabarito, BackEnding) == 0)
                 {
-                  fgets(comando, MAX, stdin);
+                  fgets(comando, MAX_STRING, stdin);
 
                   int n = Comandos(comando);
 
@@ -112,19 +120,19 @@
 
             else if(acao == 2) //Carregar jogo salvo
             {
-              carregarJogo(&*tabuleiro2, comando, &player2, &matriz2);
+              // carregarJogo(&*tabuleiro2, comando, &player2, &matriz2);
 
-              ImprimeTabuleiro(tabuleiro, matriz2);
+              // ImprimeTabuleiro(tabuleiro, matriz2);
 
-              fgets(comando, MAX, stdin);
-              acao = comando[0] - '0';
-              while(comando[1] != '\n' || acao < 0 || acao > 4)
-              {
-                printf(RED("\n\nComando inválido!\n\n"));
-                fgets(comando, MAX, stdin);
-                acao = comando[0] - '0';
-              }
-              continue;
+              // fgets(comando, MAX_STRING, stdin);
+              // acao = comando[0] - '0';
+              // while(comando[1] != '\n' || acao < 0 || acao > 4)
+              // {
+              //   printf(RED("\n\nComando inválido!\n\n"));
+              //   fgets(comando, MAX_STRING, stdin);
+              //   acao = comando[0] - '0';
+              // }
+              // continue;
             }
 
             else if(acao == 3) //Continuar jogo atual
