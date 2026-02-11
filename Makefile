@@ -1,17 +1,25 @@
-all: jogo.o auxiliares.o main.o tabuleiro.o comandos.o dbg.o
-	@gcc main.o auxiliares.o tabuleiro.o jogo.o comandos.o dbg.o -g -Wall -o exe
-	@rm main.o auxiliares.o tabuleiro.o jogo.o comandos.o dbg.o
-main.o: main.c
-	@gcc main.c -c
-auxiliares.o: auxiliares.c
-	@gcc auxiliares.c -c
-tabuleiro.o: tabuleiro.c
-	@gcc tabuleiro.c -c
-jogo.o: jogo.c
-	@gcc jogo.c -c
-comandos.o: comandos.c
-	@gcc comandos.c -c
-dbg.o: dbg.c
-	@gcc dbg.c -c
-run:
-	@./exe
+# Compilador e flags
+CC = gcc
+CFLAGS = -g -Wall -Wextra -O2 -Isrc/include
+
+# Diretórios fonte e binario
+DIR_FONTE = src
+DIR_BIN   = bin
+
+# Arquivos fonte e alvo
+FONTE = $(DIR_FONTE)/*.c
+EXECUTAVEL = $(DIR_BIN)/tp.exe
+
+
+# ============== Regras para compilar e executar o projeto ==============
+compile: $(EXECUTAVEL)
+
+$(EXECUTAVEL): $(FONTE)
+	@mkdir -p $(DIR_BIN)
+	$(CC) $(CFLAGS) $(FONTE) -o $@ -lm
+
+run: $(EXECUTAVEL)
+	@./$(EXECUTAVEL) 
+
+clean:
+	@rm -f $(EXECUTAVEL)
