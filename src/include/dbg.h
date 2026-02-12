@@ -9,9 +9,9 @@
 #define Debug_mark              printf(FG_RGB(255, 255, 0) _BOLD "[DEBUG] " RESET);
 #define printError(string)      printf(FG_RGB(255, 0, 0)  _BOLD string RESET);
 
-void _Debug_printRankingBuilder(RankingBuilder);
+void _Debug_printRankingBuilder(Ranking_t);
 
-void _Debug_printRankingandPlayer(RankingBuilder, Jogadores);
+void _Debug_printRankingandPlayer(Ranking_t, Jogador_t);
 
 
 #endif

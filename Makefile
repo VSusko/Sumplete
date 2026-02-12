@@ -21,5 +21,8 @@ $(EXECUTAVEL): $(FONTE)
 run: $(EXECUTAVEL)
 	@./$(EXECUTAVEL) 
 
+runval:
+	@valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all ./$(EXECUTAVEL)
+
 clean:
 	@rm -f $(EXECUTAVEL)

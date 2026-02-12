@@ -7,11 +7,11 @@ void Menu();
 
 void ImprimeComandos();
     
-void ImprimeTabuleiro(Tabuleiro_t, int**);
+void ImprimeTabuleiro(Tabuleiro_t* tabuleiro);
 
 void ImprimirRanking();
 
-void ImprimirFim(Jogadores, time_t);
+void ImprimirFim(Jogador_t, time_t);
 
 void MenuJogarNovamente(int*);
 
@@ -19,8 +19,8 @@ void ImprimirAcao3(int*);
 
 void ImprimirAcao4(int*);
 
-void ImprimirRankingHeader();
+void ImprimirCabecalhoRanking();
 
-void ImprimirRankingBody(RankingBuilder, Jogadores);
+void ImprimirCorpoRanking(Ranking_t*, Jogador_t);
 
 #endif

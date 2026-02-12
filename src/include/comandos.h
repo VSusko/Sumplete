@@ -11,16 +11,16 @@
 #include "jogo.h"
 #include "cores.h"
 
-void Resolver(Tabuleiro_t, Jogadores, int***, int**, time_t);
+void Resolver(Tabuleiro_t *tabuleiro, Jogador_t player, time_t begin);
     
-void Dica(Tabuleiro_t,int***,int**, int*, int);
+void Dica(Tabuleiro_t *tabuleiro, int *contadicas);
 
-void Salvar(char*, Jogadores, Tabuleiro_t, int**, int**, time_t);
+void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *comando, time_t begin);
 
-void Remover(Tabuleiro_t, char*, int***, int*, int**, int*);
+void Remover(Tabuleiro_t *tabuleiro, char *comando, int *contadicas, int *acao);
 
-void Voltar(Tabuleiro_t*, int***, int**, int*);
+void Voltar(Tabuleiro_t *tabuleiro, int *acao);
 
-void Manter(char*, Tabuleiro_t, int***);
+void Manter(Tabuleiro_t *tabuleiro, char *comando);
 
 #endif

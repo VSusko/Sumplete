@@ -1,6 +1,6 @@
 #include "jogo.h"
 
-// void rankingInicia(RankingBuilder *rankingBuilder)
+// void rankingInicia(Ranking_t *rankingBuilder)
 // {
 //   // Inicializando jogadores_por_categoria e total_jogadores
 
@@ -19,7 +19,7 @@
 //   }
 // }
 
-bool jogadoresSaoIguais(Jogadores x, Jogadores y)
+bool jogadoresSaoIguais(Jogador_t x, Jogador_t y)
 {
 	if (strcmp(x.nome, y.nome) || x.tamanho != y.tamanho || x.tempo != y.tempo)
 		return false;
@@ -28,71 +28,67 @@ bool jogadoresSaoIguais(Jogadores x, Jogadores y)
 }
 
 // Função que cria um gabarito para um jogo, não funciona sem a função criaJogo
-
-void criaGabarito(int ***gabarito, int nlines, char dificuldade)
+void criaGabarito(Tabuleiro_t *tabuleiro, int num_linhas)
 {
-	criaMatriz(gabarito, nlines);
-
 	srand(time(NULL));
 
 	// Gerando gabarito aleatorio
 
-	if (dificuldade == 'f' || dificuldade == 'F')
-		for (int i = 0; i < nlines; i++)
-			for (int j = 0; j < nlines; j++)
+	if (tabuleiro->dificuldade == 'f' || tabuleiro->dificuldade == 'F')
+		for (int i = 0; i < num_linhas; i++)
+			for (int j = 0; j < num_linhas; j++)
 			{
-				(*gabarito)[i][j] = rand() % 2;
+				tabuleiro->gabarito[i][j] = rand() % 2;
 			}
 
-	else if (dificuldade == 'm' || dificuldade == 'M')
+	else if (tabuleiro->dificuldade == 'm' || tabuleiro->dificuldade == 'M')
 	{
 		// variaveis que irão validar a soma das linhas e das colunas
-
 		int Validar_Soma_Linha = 0;
 		int Validar_Soma_Coluna = 0;
 
 		do
 		{
-			for (int i = 0; i < nlines; i++)
+			for (int i = 0; i < num_linhas; i++)
 			{
 				Validar_Soma_Linha = 0;
-				for (int j = 0; j < nlines; j++)
+				for (int j = 0; j < num_linhas; j++)
 				{
-					(*gabarito)[i][j] = rand() % 2;
-					if ((*gabarito)[i][j] == 1)
+					tabuleiro->gabarito[i][j] = rand() % 2;
+					if (tabuleiro->gabarito[i][j] == 1)
 					{
 						Validar_Soma_Linha++;
 					}
-					else if (j == nlines - 1 && (Validar_Soma_Linha == nlines || Validar_Soma_Linha == 0))
+					else if (j == num_linhas - 1 && (Validar_Soma_Linha == num_linhas || Validar_Soma_Linha == 0))
 						break;
 				}
-				if (Validar_Soma_Linha == nlines || Validar_Soma_Linha == 0)
+				if (Validar_Soma_Linha == num_linhas || Validar_Soma_Linha == 0)
 					break;
 			}
 
-			if (Validar_Soma_Linha == nlines || Validar_Soma_Linha == 0)
+			if (Validar_Soma_Linha == num_linhas || Validar_Soma_Linha == 0)
 				continue;
 
 			else
 			{
-				for (int i = 0; i < nlines; i++)
+				for (int i = 0; i < num_linhas; i++)
 				{
 					Validar_Soma_Coluna = 0;
-					for (int j = 0; j < nlines; j++)
+					for (int j = 0; j < num_linhas; j++)
 					{
-						if ((*gabarito)[j][i] == 1)
+						if (tabuleiro->gabarito[j][i] == 1)
 							Validar_Soma_Coluna++;
-						else if (j == nlines - 1 && (Validar_Soma_Coluna == nlines || Validar_Soma_Coluna == 0))
+						else if (j == num_linhas - 1 && (Validar_Soma_Coluna == num_linhas || Validar_Soma_Coluna == 0))
 							break;
 					}
-					if (Validar_Soma_Coluna == nlines || Validar_Soma_Coluna == 0)
+					if (Validar_Soma_Coluna == num_linhas || Validar_Soma_Coluna == 0)
 						break;
 				}
 			}
-		} while (Validar_Soma_Linha == nlines || Validar_Soma_Coluna == nlines || Validar_Soma_Linha == 0 || Validar_Soma_Coluna == 0);
+		} while (Validar_Soma_Linha == num_linhas || Validar_Soma_Coluna == num_linhas || Validar_Soma_Linha == 0 || Validar_Soma_Coluna == 0);
 	}
 
-	else if (dificuldade == 'd' || dificuldade == 'D')
+	else if (tabuleiro->dificuldade == 'd' || tabuleiro->dificuldade == 'D')
 	{
 		// variaveis que irão validar a soma das linhas e das colunas
 
@@ -101,49 +97,50 @@ void criaGabarito(int ***gabarito, int nlines, char dificuldade)
 
 		do
 		{
-			for (int i = 0; i < nlines; i++)
+			for (int i = 0; i < num_linhas; i++)
 			{
 				Validar_Soma_Linha = 0;
-				for (int j = 0; j < nlines; j++)
+				for (int j = 0; j < num_linhas; j++)
 				{
-					(*gabarito)[i][j] = rand() % 2;
-					if ((*gabarito)[i][j] == 1)
+					tabuleiro->gabarito[i][j] = rand() % 2;
+					if (tabuleiro->gabarito[i][j] == 1)
 					{
 						Validar_Soma_Linha++;
 					}
-					else if (j == nlines - 1 && Validar_Soma_Linha == nlines)
+					else if (j == num_linhas - 1 && Validar_Soma_Linha == num_linhas)
 						break;
 				}
-				if (Validar_Soma_Linha == nlines)
+				if (Validar_Soma_Linha == num_linhas)
 					break;
 			}
 
-			if (Validar_Soma_Linha == nlines)
+			if (Validar_Soma_Linha == num_linhas)
 				continue;
 
 			else
 			{
-				for (int i = 0; i < nlines; i++)
+				for (int i = 0; i < num_linhas; i++)
 				{
 					Validar_Soma_Coluna = 0;
-					for (int j = 0; j < nlines; j++)
+					for (int j = 0; j < num_linhas; j++)
 					{
-						if ((*gabarito)[j][i] == 1)
+						if (tabuleiro->gabarito[j][i] == 1)
 						{
 							Validar_Soma_Coluna++;
 						}
-						else if (j == nlines - 1 && Validar_Soma_Coluna == nlines)
+						else if (j == num_linhas - 1 && Validar_Soma_Coluna == num_linhas)
 							break;
 					}
-					if (Validar_Soma_Coluna == nlines)
+					if (Validar_Soma_Coluna == num_linhas)
 						break;
 				}
 			}
-		} while (Validar_Soma_Linha == nlines || Validar_Soma_Coluna == nlines);
+		} while (Validar_Soma_Linha == num_linhas || Validar_Soma_Coluna == num_linhas);
 	}
+	return;
 }
 
-bool RankingWrite(RankingBuilder _r_builder)
+bool RankingWrite(Ranking_t _r_builder)
 {
 	/*
 	  Variáveis para armazenar as posições do último jogador a ser gravado no ranking.
@@ -151,7 +148,7 @@ bool RankingWrite(RankingBuilder _r_builder)
 	  pois caso isso aconteça, na próxima leitura de ranking a linha vazia será lida e preenchida como sendo
 	  um jogador existente.
 	*/
-	Jogadores ultimo;
+	Jogador_t ultimo;
 
 	// Abrindo o arquivo em modo escrita
 	FILE *gravar = fopen(RANKING_PATH, "w");
@@ -195,15 +192,14 @@ bool RankingWrite(RankingBuilder _r_builder)
 }
 
 // Função que imrprime o rank "sumplete.ini" e acrescenta os dados do jogador
-
-void Ranking(Jogadores player)
+void Ranking(Jogador_t player)
 {
-	Jogadores players_buffer[MAX_PLAYERS] = {};
+	Jogador_t players_buffer[MAX_PLAYERS] = {};
 	char string[100], stringaux[100];
 	unsigned int size, contador_players = 0, j, i = 0, contador_size[6] = {0};
 	unsigned int player_pos;
 
-	RankingBuilder r_builder = {};
+	Ranking_t r_builder = {};
 
 	FILE *arquivo = fopen(RANKING_PATH, "r");
 	if (arquivo != NULL)
@@ -250,7 +246,7 @@ void Ranking(Jogadores player)
 				continue;
 
 			// Caso a categoria está cheia e o jogador teve um tempo maior que o último colocado, o jogador não entra no ranking e o loop encerra
-			if (r_builder.jogadores_por_categoria[i] == PLAYERS_POR_TABULEIRO &&
+			if (r_builder.jogadores_por_categoria[i] == MAX_JOGADORES_POR_DIFF &&
 				player.tempo > r_builder.ranking[i][r_builder.jogadores_por_categoria[i] - 1].tempo)
 				break;
 
@@ -264,7 +260,7 @@ void Ranking(Jogadores player)
 			}
 
 			// Caso uma categoria não esteja cheia e o tempo do jogador seja o último da categoria, ele será inserido na ultima posição
-			if (r_builder.jogadores_por_categoria[i] < PLAYERS_POR_TABULEIRO &&
+			if (r_builder.jogadores_por_categoria[i] < MAX_JOGADORES_POR_DIFF &&
 				player.tempo >= r_builder.ranking[i][r_builder.jogadores_por_categoria[i] - 1].tempo)
 			{
 				r_builder.ranking[i][r_builder.jogadores_por_categoria[i]] = player;
@@ -292,7 +288,7 @@ void Ranking(Jogadores player)
 				}
 
 				// Caso a categoria ainda não esteja cheia, o número de jogadores nessa categoria aumenta
-				if (r_builder.jogadores_por_categoria[i] < PLAYERS_POR_TABULEIRO)
+				if (r_builder.jogadores_por_categoria[i] < MAX_JOGADORES_POR_DIFF)
 				{
 					r_builder.jogadores_por_categoria[i]++;
 					r_builder.total_jogadores++;
@@ -319,10 +315,10 @@ void Ranking(Jogadores player)
 #endif
 
 		// Imprimindo o ranking no terminal - cabeçalho
-		ImprimirRankingHeader();
+		ImprimirCabecalhoRanking();
 
 		// Imprimindo ranking no terminal - corpo do ranking
-		ImprimirRankingBody(r_builder, player);
+		ImprimirCorpoRanking(&r_builder, player);
 
 		// Gravando os dados do ranking no arquivo
 		RankingWrite(r_builder);
@@ -334,87 +330,88 @@ void Ranking(Jogadores player)
 }
 
 // Função que cria um jogo e retorna as alterações no tabuleiro e o gabarito desse jogo
-
-Tabuleiro_t criaJogo(Tabuleiro_t tabuleiro, int ***gabarito, char dificuldade)
+void criaJogo(Tabuleiro_t *tabuleiro)
 {
-	// Alocando memoria para a matriz do tabuleiro
-
-	criaMatriz(&tabuleiro.matriz, tabuleiro.tamanho);
+	// Alocando memoria para a matriz dos numeros do tabuleiro
+	criaMatriz(tabuleiro->tabela_numeros, tabuleiro->tamanho);
+	// Alocando memoria para a matriz manipulada pelo usuario
+	criaMatriz(tabuleiro->tabela_usuario, tabuleiro->tamanho);
+	// Alocando memoria para a matriz do gabarito
+	criaMatriz(tabuleiro->gabarito, tabuleiro->tamanho);
 
 	// Alocando memoria para a soma de linhas e colunas do tabuleiro
-
-	tabuleiro.somaColunas = malloc(tabuleiro.tamanho * sizeof(int));
-	tabuleiro.somaLinhas = malloc(tabuleiro.tamanho * sizeof(int));
+	tabuleiro->somaColunas = calloc(tabuleiro->tamanho, sizeof(int));
+	tabuleiro->somaLinhas = calloc(tabuleiro->tamanho, sizeof(int));
 
 	// Gerando semente aleatória para os números e a soma
-
 	srand(time(NULL));
 
 	// Gerando uma matriz com numeros aleatorios
-
-	if (dificuldade == 'f' || dificuldade == 'F' || dificuldade == 'm' || dificuldade == 'M')
+	if (tabuleiro->dificuldade == 'f' || tabuleiro->dificuldade == 'F' || tabuleiro->dificuldade == 'm' || tabuleiro->dificuldade == 'M')
 	{
-		for (int i = 0; i < tabuleiro.tamanho; i++)
+		for (int i = 0; i < tabuleiro->tamanho; i++)
 		{
-			for (int j = 0; j < tabuleiro.tamanho; j++)
+			for (int j = 0; j < tabuleiro->tamanho; j++)
 			{
-				tabuleiro.matriz[i][j] = 1 + (rand() % 9);
+				tabuleiro->tabela_numeros[i][j] = 1 + (rand() % 9);
 			}
 		}
 	}
 
-	else if (dificuldade == 'd' || dificuldade == 'D')
+	else if (tabuleiro->dificuldade == 'd' || tabuleiro->dificuldade == 'D')
 	{
-		for (int i = 0; i < tabuleiro.tamanho; i++)
+		for (int i = 0; i < tabuleiro->tamanho; i++)
 		{
-			for (int j = 0; j < tabuleiro.tamanho; j++)
+			for (int j = 0; j < tabuleiro->tamanho; j++)
 			{
-				tabuleiro.matriz[i][j] = (rand() % 19) - 9;
+				tabuleiro->tabela_numeros[i][j] = (rand() % 19) - 9;
 			}
 		}
 	}
 
 	// Gerando matriz gabarito
-
-	criaGabarito(&*gabarito, tabuleiro.tamanho, dificuldade);
-
-	// Limpando a memoria das somas das linhas e colunas
-
-	for (int i = 0; i < tabuleiro.tamanho; i++)
-	{
-		tabuleiro.somaLinhas[i] = 0;
-		tabuleiro.somaColunas[i] = 0;
-	}
+	criaGabarito(tabuleiro->gabarito, tabuleiro->tamanho);
 
 	// Soma das linhas e colunas segundo o gabarito
-	for (int i = 0; i < tabuleiro.tamanho; i++)
+	for (int i = 0; i < tabuleiro->tamanho; i++)
 	{
-		for (int j = 0; j < tabuleiro.tamanho; j++)
+		for (int j = 0; j < tabuleiro->tamanho; j++)
 		{
-			if ((*gabarito)[i][j] == 1)
+			if (tabuleiro->gabarito[i][j] == true)
 			{
-				tabuleiro.somaLinhas[i] += tabuleiro.matriz[i][j];
-				tabuleiro.somaColunas[j] += tabuleiro.matriz[i][j];
+				tabuleiro->somaLinhas[i] += tabuleiro->tabela_numeros[i][j];
+				tabuleiro->somaColunas[j] += tabuleiro->tabela_numeros[i][j];
 			}
 		}
 	}
 
-	return tabuleiro;
+	// Inicializando a matriz manipulada pelo usuário com o valor 1, que significa que o número daquela posição ainda não foi manipulado
+	for (int i = 0; i < tabuleiro->tamanho; i++)
+	{
+		for (int j = 0; j < tabuleiro->tamanho; j++)
+		{
+			tabuleiro->tabela_usuario[i][j] = 1;
+			// Se no gabarito o valor deve ser mantido, o jogador tem direito a uma dica para aquele número
+			if(tabuleiro->gabarito[i][j] == 1)
+                tabuleiro->max_dicas++;
+		}
+	}
+
+	return;
 }
 
 // Função que compara o gabarito com a matriz que está sendo manipulada pelo usuario
-
-int Comparador(Tabuleiro_t tabuleiro, int **gabarito, int **matriz)
+bool Comparador(Tabuleiro_t *tabuleiro)
 {
-	for (int i = 0; i < tabuleiro.tamanho; i++)
+	for (int i = 0; i < tabuleiro->tamanho; i++)
 	{
-		for (int j = 0; j < tabuleiro.tamanho; j++)
+		for (int j = 0; j < tabuleiro->tamanho; j++)
 		{
-			if (gabarito[i][j] == 0 && matriz[i][j] != 0)
-				return 0;
+			if (tabuleiro->gabarito[i][j] == 0 && tabuleiro->tabela_usuario[i][j] != 0)
+				return false;
 		}
 	}
-	return 1; // 1 significa que ganhou -> quando todos os elementos de matriz são iguasi aos de gabarito e iguais a zero
+	return true; // 1 significa que ganhou -> quando todos os elementos de matriz são iguasi aos de gabarito e iguais a zero
 }
 
 // Função que faz as operações dos comandos
@@ -444,41 +441,42 @@ int Comandos(char *comando)
 	return 0;
 }
 
-Jogadores ColetarDadosJogador(Jogadores player)
+void ColetarDadosJogador(Jogador_t *jogador)
 {
 	printf(YELLOW("\nDigite o nome do jogador: "));
-	fgets(player.nome, MAX_STRING, stdin);
+	fgets(jogador->nome, MAX_STRING, stdin);
 
 	int i = 0; // tirando o \n do nome do jogador
-	while (player.nome[i] != '\n')
+	while (jogador->nome[i] != '\n')
 	{
 		i++;
 	}
-	player.nome[i] = '\0';
+	jogador->nome[i] = '\0';
 
-	return player;
+	return;
 }
 
-Tabuleiro_t ColetarDadosJogo(Tabuleiro_t tabuleiro, char *comando, char *dificuldade)
+void ColetarDadosJogo(Tabuleiro_t *tabuleiro)
 {
+	char comando[MAX_STRING];
 	printf(YELLOW("\nDigite o tamanho do tabuleiro (3 à 9): "));
 	fgets(comando, MAX_STRING, stdin);
 
-	tabuleiro.tamanho = comando[0] - '0';
+	tabuleiro->tamanho = comando[0] - '0';
 
-	while ((tabuleiro.tamanho > 9 || tabuleiro.tamanho < 3) || comando[1] != '\n') // validação do tamanho do tabuleiro
+	while ((tabuleiro->tamanho > 9 || tabuleiro->tamanho < 3) || comando[1] != '\n') // validação do tamanho do tabuleiro
 	{
 		printf("\nTamanho ");
 		printf(RED("INVÁLIDO!"));
 		printf(" Digite uma número de 3 à 9: ");
 		fgets(comando, MAX_STRING, stdin);
-		tabuleiro.tamanho = comando[0] - '0';
+		tabuleiro->tamanho = comando[0] - '0';
 	}
 
-	if (tabuleiro.tamanho < 5)
-		*dificuldade = 'f';
+	if (tabuleiro->tamanho < 5)
+		tabuleiro->dificuldade = 'f';
 
-	else if (tabuleiro.tamanho < 7)
+	else if (tabuleiro->tamanho < 7)
 	{
 		printf(YELLOW("\nDigite o nível de dificuldade: Fácil("));
 		printf(BLUE("F"));
@@ -490,10 +488,10 @@ Tabuleiro_t ColetarDadosJogo(Tabuleiro_t tabuleiro, char *comando, char *dificul
 		printf(GREEN("m"));
 		printf(YELLOW("): "));
 		fgets(comando, MAX_STRING, stdin);
-		*dificuldade = comando[0];
+		tabuleiro->dificuldade = comando[0];
 	}
 
-	else if (tabuleiro.tamanho <= 9)
+	else if (tabuleiro->tamanho <= 9)
 	{
 		printf(YELLOW("\nDigite o nível de dificuldade: Fácil("));
 		printf(BLUE("F"));
@@ -509,21 +507,24 @@ Tabuleiro_t ColetarDadosJogo(Tabuleiro_t tabuleiro, char *comando, char *dificul
 		printf(RED("d"));
 		printf(YELLOW("): "));
 		fgets(comando, MAX_STRING, stdin);
-		*dificuldade = comando[0];
+		tabuleiro->dificuldade = comando[0];
 	}
 
 	// Validando a dificuldade
-	while (((*dificuldade) != 'f' && (*dificuldade) != 'F' && (*dificuldade) != 'm' && (*dificuldade) != 'M' && (*dificuldade) != 'd' && (*dificuldade) != 'D') || comando[1] != '\n')
+	while ((tabuleiro->dificuldade != 'f' && tabuleiro->dificuldade != 'F' 
+			&& tabuleiro->dificuldade != 'm' && tabuleiro->dificuldade != 'M' 
+			&& tabuleiro->dificuldade != 'd' && tabuleiro->dificuldade != 'D') 
+			|| comando[1] != '\n')
 	{
 		printf("\n\nComando ");
 		printf(RED("inválido!"));
 		printf(" Digite apenas um dos caracteres mostrados: ");
 		fflush(stdin);
 		fgets(comando, MAX_STRING, stdin);
-		(*dificuldade) = comando[0];
+		(tabuleiro->dificuldade) = comando[0];
 	}
 
-	while (tabuleiro.tamanho < 7 && ((*dificuldade) == 'd' || (*dificuldade) == 'D'))
+	while (tabuleiro->tamanho < 7 && (tabuleiro->dificuldade == 'd' || tabuleiro->dificuldade == 'D'))
 	{
 		printf("\nO nível ");
 		printf(RED("DIFÍCIL"));
@@ -531,7 +532,7 @@ Tabuleiro_t ColetarDadosJogo(Tabuleiro_t tabuleiro, char *comando, char *dificul
 
 		printf("\nDigite novamente o nível de dificuldade: ");
 
-		if (tabuleiro.tamanho < 7)
+		if (tabuleiro->tamanho < 7)
 		{
 			printf("Fácil(");
 			printf(BLUE("F"));
@@ -545,14 +546,15 @@ Tabuleiro_t ColetarDadosJogo(Tabuleiro_t tabuleiro, char *comando, char *dificul
 		}
 
 		fgets(comando, MAX_STRING, stdin);
-		(*dificuldade) = comando[0];
+		tabuleiro->dificuldade = comando[0];
 
 		while (comando[1] != '\n')
 		{
 			printf("\nDigite apenas um caracter!\n");
 			fgets(comando, MAX_STRING, stdin);
-			(*dificuldade) = comando[0];
+			tabuleiro->dificuldade = comando[0];
 		}
 	}
-	return tabuleiro;
+
+	return;
 }

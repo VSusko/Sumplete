@@ -8,20 +8,16 @@ int main()
 {
 	// String que será utilizada ao longo de todo o codigo para receber comandos
 	char comando[MAX_STRING];
-	// Dificuldade 	
-	char dificuldade;
-	// Matriz que possui o gabarito do tabuleiro
-	int **gabarito;
 	// Variável que conta quantos elementos serão mantidos no jogo -> utilidade na função de dica
-	int contador_manter = 0;
+	int contador_manter;
 	// Variavel que irá fazer os comandos do Menu
 	int acao = 0;
 	// Variável que irá contar quantas dicas já foram dadas
-	int contadicas = 0;
+	int contadicas;
 	// Estrutura que armazena as informações do tabuleiro
-	Tabuleiro_t tabuleiro;
+	Tabuleiro_t tabuleiro = {0};
 	// Estrutura que armazena as informações do jogador
-	Jogadores jogador;
+	Jogador_t jogador;
 
 	Menu();
 	fgets(comando, MAX_STRING, stdin);
@@ -36,38 +32,33 @@ int main()
 
 	while (acao != 5)
 	{
-		contador_manter = 0, contadicas = 0, dificuldade = 'c';
+		contador_manter = 0, contadicas = 0, tabuleiro.dificuldade = 'c';
 
 		if (acao == 0)
 			return 0;
 
 		else if (acao == 1)
 		{
-			contador_manter = 0, contadicas = 0, dificuldade = 'c'; // reset das variaveis
+			contador_manter = 0, contadicas = 0, tabuleiro.dificuldade = 'c'; // reset das variaveis
 
 			fflush(stdin); // Função que limpa o buffer
 
 			#if DEBUG
 				strcpy(jogador.nome, "SUQUINHO");
 				tabuleiro.tamanho = 5;
-				dificuldade = 'f';
+				tabuleiro.dificuldade = 'f';
 			#else
-				jogador = ColetarDadosJogador(jogador);							// Entrada do nome do jogador
-				tabuleiro = ColetarDadosJogo(tabuleiro, comando, &dificuldade); // Entrada de dados do jogo
+				jogador = ColetarDadosJogador(jogador);			  // Entrada do nome do jogador
+				tabuleiro = ColetarDadosJogo(tabuleiro); // Entrada de dados do jogo
 			#endif
 
-			tabuleiro = criaJogo(tabuleiro, &gabarito, dificuldade);
-			int **BackEnding; // Matriz que será manipulada
-			criaMatriz(&BackEnding, tabuleiro.tamanho);
-			BackEnding = iniciaMatrizBackEnding(tabuleiro, BackEnding, gabarito, &contador_manter);
-
+			criaJogo(&tabuleiro);
 			jogador.tamanho = tabuleiro.tamanho;
-
-			ImprimeTabuleiro(tabuleiro, BackEnding);
+			ImprimeTabuleiro(&tabuleiro);
 
 			time_t begin = time(NULL);
 
-			while (Comparador(tabuleiro, gabarito, BackEnding) == 0)
+			while (Comparador(&tabuleiro) == 0)
 			{
 				fgets(comando, MAX_STRING, stdin);
 
@@ -83,33 +74,33 @@ int main()
 					
 					// Comando Resolver
 					case 1:
-						Resolver(tabuleiro, jogador, &BackEnding, gabarito, begin);
+						Resolver(&tabuleiro, jogador, begin);
 						acao = 5;
 						break;
 					
 					// Comando dica
 					case 2: 
-						Dica(tabuleiro, &BackEnding, gabarito, &contadicas, contador_manter);
+						Dica(&tabuleiro, &contadicas);
 						break;
 
 					// Comando Manter
 					case 3:
-						Manter(comando, tabuleiro, &BackEnding);
+						Manter(comando, &tabuleiro);
 						break;
 
 					// Comando Salvar
 					case 4:
-						Salvar(comando, jogador, tabuleiro, gabarito, BackEnding, begin);
+						Salvar(&tabuleiro, &jogador, comando, begin);
 						break;
 					
 					// Comando Voltar
 					case 5:
-						Voltar(&tabuleiro, &gabarito, BackEnding, &acao);
+						Voltar(&tabuleiro, &acao);
 						break;
 						
 					// Remover
 					case 6:
-						Remover(tabuleiro, comando, &BackEnding, &contadicas, gabarito, &acao);
+						Remover(&tabuleiro, comando, &contadicas, &acao);
 						break;
 						
 					default:
@@ -124,8 +115,8 @@ int main()
 			else
 			{
 				ImprimirFim(jogador, begin);
-				liberaTabuleiro(tabuleiro);
-				liberaMatriz(gabarito, tabuleiro.tamanho);
+				liberaTabuleiro(&tabuleiro);
+				liberaMatriz(tabuleiro.gabarito, tabuleiro.tamanho);
 				acao = 5;
 			}
 		}

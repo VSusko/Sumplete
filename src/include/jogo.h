@@ -10,23 +10,23 @@
 
 // void rankingInicia(RankingBuilder *rankingBuilder);
 
-bool jogadoresSaoIguais(Jogadores x, Jogadores y);
+bool jogadoresSaoIguais(Jogador_t x, Jogador_t y);
 
-void Ranking(Jogadores player);
+void Ranking(Jogador_t player);
 
 int Comandos(char*);
 
-int Comparador(Tabuleiro_t, int**, int**);
+bool Comparador(Tabuleiro_t*);
 
-void carregarJogo(Tabuleiro_t *tabuleiro, Jogadores *player, int ***BackEnding);
+void carregarJogo(Tabuleiro_t *tabuleiro, Jogador_t *player, int ***BackEnding);
 
-Tabuleiro_t criaJogo(Tabuleiro_t, int***, char);
+void criaJogo(Tabuleiro_t *tabuleiro);
 
-void criaGabarito(int***, int, char);
+void criaGabarito(Tabuleiro_t *tabuleiro, int num_linhas);
 
-Jogadores ColetarDadosJogador(Jogadores);
+void ColetarDadosJogador(Jogador_t *jogador);
 
-Tabuleiro_t ColetarDadosJogo(Tabuleiro_t, char*, char*);
+void ColetarDadosJogo(Tabuleiro_t *tabuleiro);
 
 bool RankingWrite(RankingBuilder);
 

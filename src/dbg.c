@@ -1,6 +1,6 @@
 #include "dbg.h"
 
-    void _Debug_printRankingBuilder(RankingBuilder r_builder)
+    void _Debug_printRankingBuilder(Ranking_t r_builder)
     {
         printf("\n"); Debug_mark printf(_ORANGE("TOTALJOGADORES = %d\n"), r_builder.total_jogadores);
         for(int i = 0; i < NUM_TABULEIROS; i++)
@@ -9,7 +9,7 @@
             printf(_RED("NÚMERO DE JOGADORES EM SIZE")); 
             printf(_GREEN(" [%d] "), i+3); 
             printf(("= %d\n\n"), r_builder.jogadores_por_categoria[i]);
-            for (int j = 0; j < PLAYERS_POR_TABULEIRO; j++)
+            for (int j = 0; j < MAX_JOGADORES_POR_DIFF; j++)
             {
                 Debug_mark printf(_YELLOW("JOGADOR %d| NOME: %s | TEMPO = %ld|\n"), j+1, r_builder.ranking[i][j].nome, r_builder.ranking[i][j].tempo);
             }
@@ -17,7 +17,7 @@
         }
     }
 
-    void _Debug_printRankingandPlayer(RankingBuilder r_builder, Jogadores player)
+    void _Debug_printRankingandPlayer(Ranking_t r_builder, Jogador_t player)
     {
         printf("\n"); Debug_mark printf(_ORANGE("TOTALJOGADORES = %d\n"), r_builder.total_jogadores);
         for(int i = 0; i < NUM_TABULEIROS; i++)
@@ -26,7 +26,7 @@
             printf(_RED("NÚMERO DE JOGADORES EM SIZE")); 
             printf(_GREEN(" [%d] "), i+3); 
             printf(("= %d\n\n"), r_builder.jogadores_por_categoria[i]);            
-            for (int j = 0; j < PLAYERS_POR_TABULEIRO; j++)
+            for (int j = 0; j < MAX_JOGADORES_POR_DIFF; j++)
             {
                 if(!strcmp(r_builder.ranking[i][j].nome, player.nome))
                 {

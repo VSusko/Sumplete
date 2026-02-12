@@ -6,115 +6,114 @@
 #include "auxiliares.h"
 
 
-    int encontraGabarito(int i, int j, int tam, Tabuleiro_t tabuleiro, int somaLinha, int ***gabarito)
-    {
-        return 0;
+    // int encontraGabarito(int i, int j, int tam, Tabuleiro_t tabuleiro, int somaLinha, int ***gabarito)
+    // {
+    //     return 0;
         
-        // if(i > tam-1 || j > tam-1)
-        //     return 0; 
+    //     if(i > tam-1 || j > tam-1)
+    //         return 0; 
         
-        // int soma = tabuleiro.matriz[i][j];
-        // return soma + encontraGabarito(i+1, j, tam, tabuleiro, somaLinha, gabarito);
+    //     int soma = tabuleiro.matriz[i][j];
+    //     return soma + encontraGabarito(i+1, j, tam, tabuleiro, somaLinha, gabarito);
 
-        // if(soma + tabuleiro.matriz[i][j] > somaLinha)
-        // {
-        //     (*gabarito)[i][j] = 0;
-        //     return 0;
-        // }
+    //     if(soma + tabuleiro.matriz[i][j] > somaLinha)
+    //     {
+    //         (*gabarito)[i][j] = 0;
+    //         return 0;
+    //     }
         
-        // (*gabarito)[i][j] = 1;
+    //     (*gabarito)[i][j] = 1;
         
-        // return soma + encontraGabarito(i, j+1, tam, tabuleiro, somalinha, gabarito);
-    }   
+    //     return soma + encontraGabarito(i, j+1, tam, tabuleiro, somalinha, gabarito);
+    // }   
 
 
     //Função que carrega jogo salvo
-    void carregarJogo(Tabuleiro_t *tabuleiro, Jogadores *player, int ***BackEnding)
-    {
-        return;
-        // char comando[MAX_STRING];
+    // void carregarJogo(Tabuleiro_t *tabuleiro, Jogador_t *player, int ***BackEnding)
+    // {
+    //     char comando[MAX_STRING];
 
-        // printf("\nDigite o nome do arquivo.txt:\n\n");
-        // fgets(comando, MAX_STRING, stdin);
+    //     printf("\nDigite o nome do arquivo.txt:\n\n");
+    //     fgets(comando, MAX_STRING, stdin);
 
-        // if(comando[6] == '\n')
-        // {
-        //     printf("\n\nFormato ");
-        //     printf(RED("NÃO"));
-        //     printf(" suportado! Digite o nome do arquivo.txt\n\n");
-        // }
+    //     if(comando[6] == '\n')
+    //     {
+    //         printf("\n\nFormato ");
+    //         printf(RED("NÃO"));
+    //         printf(" suportado! Digite o nome do arquivo.txt\n\n");
+    //     }
 
-        // else
-        // {
-        //     //validando o formato do texto
-        //     int t = 0;
-        //     while(comando[t] != '.')
-        //         t++;
+    //     else
+    //     {
+    //         //validando o formato do texto
+    //         int t = 0;
+    //         while(comando[t] != '.')
+    //             t++;
 
-        //     if(comando[t+1] != 't' || comando[t+2] != 'x' || comando[t+3] != 't' || comando[t] != '.')
-        //     {
-        //         printf("\n\nFormato ");
-        //         printf(RED("NÃO"));
-        //         printf(" suportado! Digite o nome do arquivo.txt\n\n");
-        //         return;
-        //     }
+    //         if(comando[t+1] != 't' || comando[t+2] != 'x' || comando[t+3] != 't' || comando[t] != '.')
+    //         {
+    //             printf("\n\nFormato ");
+    //             printf(RED("NÃO"));
+    //             printf(" suportado! Digite o nome do arquivo.txt\n\n");
+    //             return;
+    //         }
 
-        // }
+    //     }
 
-        // FILE *arquivo = fopen("savenome", "r");
-        // int manterCount;
-        // int removerCount;
-        // int linha, coluna;
+    //     FILE *arquivo = fopen("savenome", "r");
+    //     int manterCount;
+    //     int removerCount;
+    //     int linha, coluna;
 
-        // fscanf(arquivo, " %d", &(*tabuleiro)->tamanho);
+    //     fscanf(arquivo, " %d", &(*tabuleiro)->tamanho);
         
-        // criaMatriz(&(*tabuleiro)->matriz, (*tabuleiro)->tamanho);
-        // criaMatriz(&*matriz, (*tabuleiro)->tamanho);
+    //     criaMatriz(&(*tabuleiro)->matriz, (*tabuleiro)->tamanho);
+    //     criaMatriz(&*matriz, (*tabuleiro)->tamanho);
 
-        // //Colocando os valores da matriz do tabuleiro
+    //     //Colocando os valores da matriz do tabuleiro
 
-        // for(int i = 0; i < (*tabuleiro)->tamanho; i++)
-        //     for(int j = 0; j < (*tabuleiro)->tamanho; j++)
-        //         fscanf(arquivo, " %d", &(*tabuleiro)->matriz[i][j]);
+    //     for(int i = 0; i < (*tabuleiro)->tamanho; i++)
+    //         for(int j = 0; j < (*tabuleiro)->tamanho; j++)
+    //             fscanf(arquivo, " %d", &(*tabuleiro)->matriz[i][j]);
 
-        // //alocando dinamicamente o tamanho da soma das linhas e das colunas
+    //     //alocando dinamicamente o tamanho da soma das linhas e das colunas
 
-        // (*tabuleiro)->somaLinhas = malloc((*tabuleiro)->tamanho * sizeof(int));
-        // (*tabuleiro)->somaColunas = malloc((*tabuleiro)->tamanho * sizeof(int));
+    //     (*tabuleiro)->somaLinhas = malloc((*tabuleiro)->tamanho * sizeof(int));
+    //     (*tabuleiro)->somaColunas = malloc((*tabuleiro)->tamanho * sizeof(int));
 
-        // //pegando os valores da soma das linhas
+    //     //pegando os valores da soma das linhas
 
-        // for(int i = 0; i < (*tabuleiro)->tamanho; i++)
-        //     fscanf(arquivo, " %d", &(*tabuleiro)->somaLinhas[i]);
+    //     for(int i = 0; i < (*tabuleiro)->tamanho; i++)
+    //         fscanf(arquivo, " %d", &(*tabuleiro)->somaLinhas[i]);
 
-        // //pegando os valores da soma das colunas
+    //     //pegando os valores da soma das colunas
         
-        // for(int i = 0; i < (*tabuleiro)->tamanho; i++)
-        //     fscanf(arquivo, " %d", &(*tabuleiro)->somaColunas[i]);
+    //     for(int i = 0; i < (*tabuleiro)->tamanho; i++)
+    //         fscanf(arquivo, " %d", &(*tabuleiro)->somaColunas[i]);
 
-        // fscanf(arquivo, " %d", &manterCount);
+    //     fscanf(arquivo, " %d", &manterCount);
 
-        // for(int i = 0; i < manterCount; i++)
-        // {
-        //     fscanf(arquivo, "%d %d", &linha, &coluna);
-        //     linha--;
-        //     coluna--;
-        //     *(matriz)[linha][coluna] = 2;
-        // }
+    //     for(int i = 0; i < manterCount; i++)
+    //     {
+    //         fscanf(arquivo, "%d %d", &linha, &coluna);
+    //         linha--;
+    //         coluna--;
+    //         *(matriz)[linha][coluna] = 2;
+    //     }
           
-        // fscanf(arquivo, " %d", &removerCount);
+    //     fscanf(arquivo, " %d", &removerCount);
 
-        // for(int i = 0; i < removerCount; i++)
-        // {
-        //     fscanf(arquivo, "%d %d", &linha, &coluna);
-        //     linha--;
-        //     coluna--;
-        //     (*matriz)[linha][coluna] = 0;
-        // }
+    //     for(int i = 0; i < removerCount; i++)
+    //     {
+    //         fscanf(arquivo, "%d %d", &linha, &coluna);
+    //         linha--;
+    //         coluna--;
+    //         (*matriz)[linha][coluna] = 0;
+    //     }
 
-        // fgets((*player)->nome, MAX_STRING, arquivo);
+    //     fgets((*player)->nome, MAX_STRING, arquivo);
 
-        // fscanf(arquivo, " %ld", &(*player)->tempo);
+    //     fscanf(arquivo, " %ld", &(*player)->tempo);
 
-        // fclose(arquivo);
-    }
+    //     fclose(arquivo);
+    // }

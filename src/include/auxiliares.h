@@ -16,7 +16,7 @@
 #define MAX_STRING 50
 #define MAX_PLAYERS 30
 #define NUM_TABULEIROS 7
-#define PLAYERS_POR_TABULEIRO 5
+#define MAX_JOGADORES_POR_DIFF 5
 #define RANKING_PATH "ranking/sumplete.ini"
 
 //Struct com informações de um tabuleiro
@@ -25,8 +25,11 @@ typedef struct
     int *somaLinhas;  //soma de cada uma das linhas do tabuleiro
     int *somaColunas; //soma de cada uma das colunas do tabuleiro
     int tamanho;      //tamanho do tabuleiro
-    int **matriz;     //matriz do tabuleiro
+    int **tabela_numeros;     //matriz do tabuleiro
+    int **tabela_usuario;     //matriz do tabuleiro que o usuário irá manipular
     bool **gabarito;   //matriz gabarito do tabuleiro
+    char dificuldade;  //dificuldade do jogo
+    int max_dicas;     //quantidade máxima de dicas que o jogador pode usar
 } Tabuleiro_t;
 
 //Struct com informações dos jogadores
@@ -35,23 +38,21 @@ typedef struct
     char nome[MAX_STRING]; //nome do jogador
     time_t tempo;          //tempo gasto pelo jogador para resolver
     int tamanho;           //tamanho do tabuleiro
-} Jogadores;
+} Jogador_t;
 
 typedef struct
 {
     int jogadores_por_categoria[NUM_TABULEIROS];    
     int total_jogadores;
-    Jogadores ranking[NUM_TABULEIROS][PLAYERS_POR_TABULEIRO];
-} RankingBuilder; 
+    Jogador_t ranking[NUM_TABULEIROS][MAX_JOGADORES_POR_DIFF];
+} Ranking_t; 
 
 void criaMatriz(int***, int);
 
 void liberaMatriz(int**, int);
 
-void liberaTabuleiro(Tabuleiro_t);
+void liberaTabuleiro(Tabuleiro_t*);
 
-int** iniciaMatrizBackEnding(Tabuleiro_t, int**, int**, int*);
-
-void trocaJogadores(Jogadores*, Jogadores*);
+void trocaJogadores(Jogador_t*, Jogador_t*);
 
 #endif
