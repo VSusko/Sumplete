@@ -7,7 +7,7 @@
 #include "interface.h"
 #include "auxiliares.h"
 
-void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t begin)
+void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t tempo_ini)
 {
     for(int i = 0; i < tabuleiro->tamanho; i++)
         for(int j = 0; j < tabuleiro->tamanho; j++)
@@ -17,8 +17,8 @@ void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t begin)
                 tabuleiro->tabela_usuario[i][j] = 2;
         }
     ImprimeTabuleiro(tabuleiro);
-    time_t end = time(NULL);
-    jogador->tempo = end - begin;
+    time_t tempo_fim = time(NULL);
+    jogador->tempo = tempo_fim - tempo_ini;
 
     return;
 }
@@ -28,9 +28,9 @@ void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
     int linha, coluna;
     bool dica_encontrada = false; 
 
-    if(*contadicas > tabuleiro->max_dicas)
+    if(*contadicas >= tabuleiro->max_dicas)
     {
-        printf(RED("\n\nAs dicas acabaram!\n\n"));
+        printf(RED("\nAs dicas acabaram!\n"));
         return;
     }
     else
@@ -59,9 +59,9 @@ void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
 }
 
 //Função que salva o jogo atual e os dados do jogador
-void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *entrada_usuario, time_t begin)
+void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *nome_do_save, time_t tempo_ini)
 {
-    if(entrada_usuario[6] == '\n')
+    if(nome_do_save[6] == '\n')
     {
         printf("\n\nFormato ");
         printf(RED("NÃO"));
@@ -72,10 +72,10 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *entrada_usuario, t
     {
         // Validando o formato do texto
         int t = 0;
-        while(entrada_usuario[t] != '.')
+        while(nome_do_save[t] != '.')
             t++;
 
-        if(entrada_usuario[t+1] != 't' || entrada_usuario[t+2] != 'x' || entrada_usuario[t+3] != 't' || entrada_usuario[t] != '.')
+        if(nome_do_save[t+1] != 't' || nome_do_save[t+2] != 'x' || nome_do_save[t+3] != 't' || nome_do_save[t] != '.')
         {
             printf("\n\nFormato ");
             printf(RED("NÃO"));
@@ -83,8 +83,8 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *entrada_usuario, t
             return;
         }
 
-        time_t end = time(NULL);
-        jogador->tempo = end - begin;
+        time_t tempo_fim = time(NULL);
+        jogador->tempo = tempo_fim - tempo_ini;
     }
 
     // String que conterá o nome do save do jogador
@@ -92,10 +92,10 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *entrada_usuario, t
     int i = 0, manterCount = 0, removerCount = 0;
     do
     {
-        nomesave[i] = entrada_usuario[i+7];
+        nomesave[i] = nome_do_save[i+7];
         i++;
     }
-    while(entrada_usuario[i+7] != '\n');
+    while(nome_do_save[i+7] != '\n');
     nomesave[i] = '\0';
 
     // ========== Salvando o jogo em um arquivo de texto ========== //
@@ -174,32 +174,25 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *entrada_usuario, t
     int t = 0;
     do
     {
-        printf(RED("%c"), entrada_usuario[t+7]);
+        printf(RED("%c"), nome_do_save[t+7]);
         t++;
     }
-    while(entrada_usuario[t+7] != '\n');
-    entrada_usuario[t+7] = '\0';
+    while(nome_do_save[t+7] != '\n');
+    nome_do_save[t+7] = '\0';
     printf(YELLOW(" com sucesso!\n\n"));
 
     return;
 }
 
-void Remover(Tabuleiro_t *tabuleiro, char *comando, int *contadicas, int *acao)
+void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, int *acao)
 {
-    int linha, coluna;
+    int linha = (elemento_removido[0] - '0') - 1;
+    int coluna = (elemento_removido[1] - '0') - 1;
     
-    if(comando[10] != '\n') //validando o comando remover
+    if(elemento_removido[2] != '\0' || linha+1 > tabuleiro->tamanho || linha+1 < 1 
+        || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)
     {
-        printf(RED("\nEsse elemento não existe! Remova um elemento váldo:\n"));
-        return;
-    }
-
-    linha = (comando[8] - '0') - 1;
-    coluna = (comando[9] - '0') - 1;
-    
-    if(linha+1 > tabuleiro->tamanho || linha+1 < 1 || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)
-    {
-        printf(RED("\nEsse elemento não existe! Remova um elemento váldo: "));
+        printError("\nEsse elemento não existe! Remova um elemento váldo: ");
         return;
     }
 
@@ -232,7 +225,7 @@ void Remover(Tabuleiro_t *tabuleiro, char *comando, int *contadicas, int *acao)
 
 void Voltar(Tabuleiro_t *tabuleiro, int *acao)
 {
-    Menu();
+    MenuVoltar();
     scanf("%d", acao);
     limpabuffer();
 
@@ -245,17 +238,17 @@ void Voltar(Tabuleiro_t *tabuleiro, int *acao)
     
     if(*acao == 3)
     {
+        printf("\n\n");
+        ExibirRanking();
         ImprimeTabuleiro(tabuleiro);
-        printf("\n");
-        fflush(stdin);
+        printf("\n\n");
         return;
     }
     else if(*acao == 4)
     {
-        printf("\n\n");
-        ImprimirRanking();
         ImprimeTabuleiro(tabuleiro);
-        printf("\n\n");
+        printf("\n");
+        limpabuffer();
         return;
     }
     else{
@@ -265,23 +258,14 @@ void Voltar(Tabuleiro_t *tabuleiro, int *acao)
     return;
 }
 
-void Manter(Tabuleiro_t *tabuleiro, char *entrada_usuario)
+void Manter(Tabuleiro_t *tabuleiro, char *elemento_mantido)
 {
-    int linha, coluna;
-
-    // Validando o comando manter
-    if(entrada_usuario[9] != '\n') 
-    {
-        printError("\n\nEsse elemento não existe! Mantenha um elemento váldo:\n\n");
-        return;
-    }
-
     // Aritimética que transforma char para int
-    linha = (entrada_usuario[7] - '0') - 1; 
-    coluna = (entrada_usuario[8] - '0') - 1;
-    
+    int linha = (elemento_mantido[0] - '0') - 1; 
+    int coluna = (elemento_mantido[1] - '0') - 1;
+
     // Mais uma validação de manter
-    if(linha+1 > tabuleiro->tamanho || linha+1 < 1 || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)
+    if(elemento_mantido[2] != '\0' || linha+1 > tabuleiro->tamanho || linha+1 < 1 || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)
     {
         printError("\n\nEsse elemento não existe! Mantenha um elemento váldo:\n\n");
         return;

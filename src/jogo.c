@@ -1,5 +1,13 @@
 #include "jogo.h"
 
+void Valida_acao(int *acao)
+{
+	while (scanf("%d", acao) == 0 || *acao < 0 || *acao > 3){
+			printError("\nAção inválida! Digite um número de 0 a 3: ");
+			limpabuffer();
+	}
+}
+
 bool jogadoresSaoIguais(Jogador_t x, Jogador_t y)
 {
 	if (strcmp(x.nome, y.nome) || x.tamanho != y.tamanho || x.tempo != y.tempo)
@@ -424,103 +432,149 @@ int ComandoParaNumero(char *entrada_usuario)
 
 void ColetarDadosJogo(Tabuleiro_t *tabuleiro)
 {
-	char comando[MAX_STRING];
 	printf(YELLOW("\nDigite o tamanho do tabuleiro (3 à 9): "));
-	fgets(comando, MAX_STRING, stdin);
-
-	tabuleiro->tamanho = comando[0] - '0';
-
-	while ((tabuleiro->tamanho > 9 || tabuleiro->tamanho < 3) || comando[1] != '\n') // validação do tamanho do tabuleiro
+	
+	// Validação do tamanho do tabuleiro
+	while (scanf("%d", &tabuleiro->tamanho) == 0 || tabuleiro->tamanho > 9 || tabuleiro->tamanho < 3)
 	{
-		printf("\nTamanho ");
-		printf(RED("INVÁLIDO!"));
-		printf(" Digite uma número de 3 à 9: ");
-		fgets(comando, MAX_STRING, stdin);
-		tabuleiro->tamanho = comando[0] - '0';
+		printError("\nTamanho INVÁLIDO! Digite um número de 3 à 9: ");
+		limpabuffer();
 	}
 
-	if (tabuleiro->tamanho < 5)
+	if (tabuleiro->tamanho < 5){
 		tabuleiro->dificuldade = 'f';
-
-	else if (tabuleiro->tamanho < 7)
-	{
-		printf(YELLOW("\nDigite o nível de dificuldade: Fácil("));
-		printf(BLUE("F"));
-		printf(YELLOW(" ou "));
-		printf(BLUE("f"));
-		printf(YELLOW(") ou Médio("));
-		printf(GREEN("M"));
-		printf(YELLOW(" ou "));
-		printf(GREEN("m"));
-		printf(YELLOW("): "));
-		fgets(comando, MAX_STRING, stdin);
-		tabuleiro->dificuldade = comando[0];
+		limpabuffer();
+		return;
 	}
-
-	else if (tabuleiro->tamanho <= 9)
-	{
-		printf(YELLOW("\nDigite o nível de dificuldade: Fácil("));
-		printf(BLUE("F"));
-		printf(YELLOW(" ou "));
-		printf(BLUE("f"));
-		printf(YELLOW("), Médio("));
-		printf(GREEN("M"));
-		printf(YELLOW(" ou "));
-		printf(GREEN("m"));
-		printf(YELLOW(") ou Difícil("));
-		printf(RED("D"));
-		printf(YELLOW(" ou "));
-		printf(RED("d"));
-		printf(YELLOW("): "));
-		fgets(comando, MAX_STRING, stdin);
-		tabuleiro->dificuldade = comando[0];
-	}
-
-	// Validando a dificuldade
-	while ((tabuleiro->dificuldade != 'f' && tabuleiro->dificuldade != 'F' 
-			&& tabuleiro->dificuldade != 'm' && tabuleiro->dificuldade != 'M' 
-			&& tabuleiro->dificuldade != 'd' && tabuleiro->dificuldade != 'D') 
-			|| comando[1] != '\n')
-	{
-		printf("\n\nComando ");
-		printf(RED("inválido!"));
-		printf(" Digite apenas um dos caracteres mostrados: ");
-		fflush(stdin);
-		fgets(comando, MAX_STRING, stdin);
-		(tabuleiro->dificuldade) = comando[0];
-	}
-
-	while (tabuleiro->tamanho < 7 && (tabuleiro->dificuldade == 'd' || tabuleiro->dificuldade == 'D'))
-	{
-		printf("\nO nível ");
-		printf(RED("DIFÍCIL"));
-		printf(" só está disponível para dimensões acima de 7!\n");
-
-		printf("\nDigite novamente o nível de dificuldade: ");
-
-		if (tabuleiro->tamanho < 7)
+	
+	if (tabuleiro->tamanho < 7){
+		ImprimirSelecaoDificuldade(tabuleiro->tamanho);
+		while(scanf(" %c", &tabuleiro->dificuldade) == 0 || (tabuleiro->dificuldade != 'f' && tabuleiro->dificuldade != 'F' 
+			&& tabuleiro->dificuldade != 'm' && tabuleiro->dificuldade != 'M'))
 		{
-			printf("Fácil(");
-			printf(BLUE("F"));
-			printf(" ou ");
-			printf(BLUE("f"));
-			printf(") ou Médio(");
-			printf(GREEN("M"));
-			printf(" ou ");
-			printf(GREEN("m"));
-			printf("): ");
+			if(tabuleiro->dificuldade == 'd' || tabuleiro->dificuldade == 'D')
+			{
+				printError("\nO nível DIFÍCIL só está disponível para tabuleiros acima de 6!\n");
+				printf(YELLOW("\nDigite novamente o nível de dificuldade: "));
+			}
+			else
+				printError("\nComando inválido! Digite um nível de dificuldade válido: ");
+
+			limpabuffer();
 		}
 
-		fgets(comando, MAX_STRING, stdin);
-		tabuleiro->dificuldade = comando[0];
-
-		while (comando[1] != '\n')
+	}
+	else{
+		ImprimirSelecaoDificuldade(tabuleiro->tamanho);
+		while(scanf(" %c", &tabuleiro->dificuldade) == 0 || (tabuleiro->dificuldade != 'f' && tabuleiro->dificuldade != 'F' 
+			&& tabuleiro->dificuldade != 'm' && tabuleiro->dificuldade != 'M'
+			&& tabuleiro->dificuldade != 'd' && tabuleiro->dificuldade != 'D'))
 		{
-			printf("\nDigite apenas um caracter!\n");
-			fgets(comando, MAX_STRING, stdin);
-			tabuleiro->dificuldade = comando[0];
+			printError("\nComando inválido! Digite um nível de dificuldade válido: \n");
+			limpabuffer();
 		}
 	}
 
+	limpabuffer();
+	return;
+}
+
+
+void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
+{
+	// String que será utilizada ao longo de todo o codigo para receber comandos
+	char entrada_usuario[MAX_STRING];
+	char comando_arg1[MAX_STRING/2];
+	char comando_arg2[MAX_STRING/2];
+
+	// Variável que irá contar quantas dicas já foram dadas
+	int contadicas = 0;
+	tabuleiro->dificuldade = 'c'; 
+
+	#if DEBUG
+		strcpy(jogador.nome, "SUQUINHO");
+		tabuleiro.tamanho = 5;
+		tabuleiro.dificuldade = 'f';
+		limpabuffer();
+	#else
+		// Entrada do nome do jogador
+		printf(YELLOW("\nDigite o nome do jogador: "));
+		scanf("%s", jogador->nome);
+		limpabuffer();
+		// Entrada de dados do jogo
+		ColetarDadosJogo(tabuleiro); 
+	#endif
+
+	criaJogo(tabuleiro);
+	jogador->tamanho = tabuleiro->tamanho;
+
+	// Mostra o tabuleiro para o jogador
+	ImprimeTabuleiro(tabuleiro);
+	
+	// Comeca a contar o tempo do jogo
+	time_t tempo_ini = time(NULL);
+
+	while (JogadorGanhou(tabuleiro) == false)
+	{
+		while(fgets(entrada_usuario, sizeof(entrada_usuario), stdin) == NULL)
+		{
+			printError("\nComando inválido! Digite um comando válido: ");
+		}
+		sscanf(entrada_usuario,"%s %s", comando_arg1, comando_arg2);
+
+		int num_comando = ComandoParaNumero(comando_arg1);
+
+		switch (num_comando)
+		{ 
+			// Comando Resolver
+			case 1:
+				Resolver(tabuleiro, jogador, tempo_ini);
+				*acao = 0;
+				break;
+			
+			// Comando dica
+			case 2: 
+				Dica(tabuleiro, &contadicas);
+				break;
+
+			// Comando Manter
+			case 3:
+				Manter(tabuleiro, comando_arg2);
+				break;
+
+			// Comando Salvar
+			case 4:
+				Salvar(tabuleiro, jogador, comando_arg2, tempo_ini);
+				break;
+			
+			// Comando Voltar
+			case 5:
+				Voltar(tabuleiro, acao);
+				if(*acao == 0 || *acao == 1 || *acao == 2) 
+					return;
+				break;
+				
+			// Remover
+			case 6:
+				Remover(tabuleiro, comando_arg2, &contadicas, acao);
+				break;
+				
+			default:
+				printError("\nComando inválido! Digite um comando válido: ");
+				break;
+		}
+	}
+	ImprimirFim(jogador, tempo_ini);
+	liberaTabuleiro(tabuleiro);
+	*acao = 0;
+}
+
+
+void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
+{
+	tabuleiro->dificuldade = 'c';
+	jogador->tamanho = 0;
+	*acao = *acao;
+	printError("\nCarregar jogo salvo ainda não implementado!\n");
 	return;
 }

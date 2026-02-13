@@ -148,7 +148,7 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 }
 
 // Função que apenas imprime o rank do arquivo "sumplete.ini"
-void ImprimirRanking()
+void ExibirRanking()
 {
 	FILE *arquivo = fopen(RANKING_PATH, "r");
 	if (arquivo != NULL)
@@ -236,53 +236,49 @@ void ImprimirRanking()
 void Menu()
 {
 	printf(YELLOW("\n BEM VINDO AO "));
-	printf(RED("SU"));
-	printf(BLUE("MP"));
-	printf(CYAN("LE"));
-	printf(MAGENTA("T"));
-	printf("E!\n");
+	printf(RED("SU"));printf(BLUE("MP"));printf(CYAN("LE"));printf(MAGENTA("T"));printf("E!\n");
 	printf(YELLOW("\nAções:\n"));
-	printf(("\n0 |"));
-	printf(YELLOW(" Sair do jogo"));
-	printf(("\n1 |"));
-	printf(YELLOW(" Começar um novo jogo"));
-	printf(("\n2 |"));
-	printf(YELLOW(" Continuar um jogo salvo em arquivo"));
-	printf(("\n3 |"));
-	printf(YELLOW(" Continuar o jogo atual"));
-	printf(("\n4 |"));
-	printf(YELLOW(" Exibir o ranking"));
-	printf(YELLOW("\n\nDurante o jogo digite "));
-	printf(RED("“voltar”"));
-	printf(YELLOW(" para retornar ao menu.\n\n"));
+	printf(("\n0 |"));printf(YELLOW(" Sair do jogo"));
+	printf(("\n1 |"));printf(YELLOW(" Começar um novo jogo"));
+	printf(("\n2 |"));printf(YELLOW(" Continuar um jogo salvo em arquivo"));
+	printf(("\n3 |"));printf(YELLOW(" Exibir o ranking"));
+	printf(YELLOW("\n\nDurante o jogo digite "));printf(RED("“voltar”"));printf(YELLOW(" para retornar ao menu.\n\n"));
 }
 
-void ImprimirFim(Jogador_t jogador, time_t begin)
+void MenuVoltar()
 {
-	time_t end = time(NULL);
-	jogador.tempo = end - begin; // coleta do tempo do jogador
+	printf(YELLOW("\n BEM VINDO AO "));
+	printf(RED("SU"));printf(BLUE("MP"));printf(CYAN("LE"));printf(MAGENTA("T"));printf("E!\n");
+	printf(YELLOW("\nAções:\n"));
+	printf(("\n0 |"));printf(YELLOW(" Sair do jogo"));
+	printf(("\n1 |"));printf(YELLOW(" Começar um novo jogo"));
+	printf(("\n2 |"));printf(YELLOW(" Continuar um jogo salvo em arquivo"));
+	printf(("\n3 |"));printf(YELLOW(" Exibir o ranking"));
+	printf(("\n4 |"));printf(YELLOW(" Continuar o jogo atual"));
+	printf(YELLOW("\n\nDurante o jogo digite "));printf(RED("“voltar”"));printf(YELLOW(" para retornar ao menu.\n\n"));
+}
+
+void ImprimirFim(Jogador_t *jogador, time_t tempo_ini)
+{
+	time_t tempo_fim = time(NULL);
+	jogador->tempo = tempo_fim - tempo_ini; // coleta do tempo do jogador
 	printf(CYAN("\nFIM DE JOGO!!\n"));
 	printf("\nTempo gasto pelo jogador ");
-	printf(BOLD(YELLOW("%s")), jogador.nome);
+	printf(BOLD(YELLOW("%s")), jogador->nome);
 	printf(": ");
-	printf(MAGENTA("%ld"), jogador.tempo);
+	printf(MAGENTA("%ld"), jogador->tempo);
 	printf(" segundos.\n\n\n");
-	Ranking(jogador);
+	Ranking(*jogador);
 }
 
 void MenuJogarNovamente(int *acao)
 {
 	printf(YELLOW("\nDeseja jogar novamente?"));
-	printf(YELLOW("\nDigite "));
-	printf(RED("1"));
-	printf(YELLOW(" para jogar novamente ou "));
-	printf(RED("0"));
+	printf(YELLOW("\nDigite "));printf(RED("1"));
+	printf(YELLOW(" para jogar novamente ou "));printf(RED("0"));
 	printf(YELLOW(" para sair do jogo:\n\n"));
 
-	scanf("%d", acao);
-	limpabuffer();
-
-	while (*acao != 0 || *acao != 1)
+	while (scanf("%d", acao) == 0 || *acao < 0 || *acao > 1)
 	{
 		printError("\nComando inválido.");
 		printf(YELLOW("\nDigite "));
@@ -290,7 +286,6 @@ void MenuJogarNovamente(int *acao)
 		printf(YELLOW(" para jogar novamente ou "));
 		printf(RED("0"));
 		printf(YELLOW(" para sair do jogo:\n\n"));
-		scanf("%d", acao);
 		limpabuffer();
 	}
 
@@ -310,67 +305,6 @@ void MenuJogarNovamente(int *acao)
 	return;
 }
 
-void ImprimirAcao3(int *acao)
-{
-	printf(YELLOW("\n\nAções:\n"));
-	printf(("\n0 |"));
-	printf(YELLOW(" Sair do jogo"));
-	printf(("\n1 |"));
-	printf(YELLOW(" Começar um novo jogo"));
-	printf(("\n2 |"));
-	printf(YELLOW(" Continuar um jogo salvo em arquivo"));
-	printf(("\n4 |"));
-	printf(YELLOW(" Exibir o ranking"));
-	printf(YELLOW("\n\nDurante o jogo digite "));
-	printf(RED("“voltar”"));
-	printf(YELLOW(" para retornar ao menu.\n\n"));
-	printError("\nVocê ainda não começou nenhum jogo. Selecione uma das opções mostradas: ");
-
-	scanf("%d", acao);
-	limpabuffer();
-
-	while (*acao < 0 || *acao > 4 || *acao == 3)
-	{
-		if (*acao < 0 || *acao > 4){
-			printError("\nComando inválido!. Selecione uma das opções mostradas: ");
-		}
-		else if (*acao == 3){	
-			printError("\nVocê ainda não começou nenhum jogo. Selecione uma das opções mostradas: ");
-		}
-
-		scanf("%d", acao);
-		limpabuffer();
-	}
-
-	return;
-}
-
-void ImprimirAcao4(int *acao)
-{
-	printf("\n\n");
-	ImprimirRanking();
-	printf(YELLOW("\nAções:\n"));
-	printf(("\n0 |"));
-	printf(YELLOW(" Sair do jogo"));
-	printf(("\n1 |"));
-	printf(YELLOW(" Começar um novo jogo"));
-	printf(("\n2 |"));
-	printf(YELLOW(" Continuar um jogo salvo em arquivo"));
-	printf(("\n4 |"));
-	printf(YELLOW(" Exibir o ranking"));
-	printf(YELLOW("\n\nDurante o jogo digite "));
-	printf(RED("“voltar”"));
-	printf(YELLOW(" para retornar ao menu.\n\n"));
-
-	scanf("%d", acao);
-	limpabuffer();
-	while (*acao < 0 || *acao > 4)
-	{
-		printError("\nComando inválido!. Selecione uma das opções mostradas:");
-		scanf("%d", acao);
-		limpabuffer();
-	}
-}
 
 void ImprimirCabecalhoRanking()
 {
@@ -418,5 +352,37 @@ void ImprimirCorpoRanking(Ranking_t *_r_builder, Jogador_t _player)
 				printf(_LIGHT_PURPLE("time%d = %ld\n"), j + 1, _r_builder->ranking[i][j].tempo);
 			}
 		}
+	}
+}
+
+void ImprimirSelecaoDificuldade(int tamanho_tabuleiro)
+{
+	if(tamanho_tabuleiro < 7)
+	{
+		printf(YELLOW("\nDigite o nível de dificuldade: Fácil("));
+		printf(BLUE("F"));
+		printf(YELLOW(" ou "));
+		printf(BLUE("f"));
+		printf(YELLOW(") ou Médio("));
+		printf(GREEN("M"));
+		printf(YELLOW(" ou "));
+		printf(GREEN("m"));
+		printf(YELLOW("): "));
+	}
+	else
+	{
+		printf(YELLOW("\nDigite o nível de dificuldade: Fácil("));
+		printf(BLUE("F"));
+		printf(YELLOW(" ou "));
+		printf(BLUE("f"));
+		printf(YELLOW("), Médio("));
+		printf(GREEN("M"));
+		printf(YELLOW(" ou "));
+		printf(GREEN("m"));
+		printf(YELLOW(") ou Difícil("));
+		printf(RED("D"));
+		printf(YELLOW(" ou "));
+		printf(RED("d"));
+		printf(YELLOW("): "));
 	}
 }

@@ -5,22 +5,22 @@
 
 void Menu();
 
+void MenuVoltar();
+
 void ImprimeComandos();
     
-void ImprimeTabuleiro(Tabuleiro_t* tabuleiro);
+void ImprimeTabuleiro(Tabuleiro_t *tabuleiro);
 
-void ImprimirRanking();
+void ExibirRanking();
 
-void ImprimirFim(Jogador_t, time_t);
+void ImprimirFim(Jogador_t *jogador, time_t tempo_ini);
 
 void MenuJogarNovamente(int *acao);
-
-void ImprimirAcao3(int *acao);
-
-void ImprimirAcao4(int *acao);
 
 void ImprimirCabecalhoRanking();
 
 void ImprimirCorpoRanking(Ranking_t*, Jogador_t);
+
+void ImprimirSelecaoDificuldade(int tamanho_tabuleiro);
 
 #endif
