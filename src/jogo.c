@@ -1,24 +1,5 @@
 #include "jogo.h"
 
-// void rankingInicia(Ranking_t *rankingBuilder)
-// {
-//   // Inicializando jogadores_por_categoria e total_jogadores
-
-//   rankingBuilder->total_jogadores = 0;
-
-//   // Inicializando a matriz ranking
-//   for (int i = 0; i < 6; i++)
-//   {
-//     rankingBuilder->jogadores_por_categoria[i] = 0;
-//     for (int j = 0; j < 5; j++)
-//     {
-//       strcpy(rankingBuilder->ranking[i][j].nome, ""); // Inicializa o nome com uma string vazia
-//       rankingBuilder->ranking[i][j].tempo = 0;        // Inicializa o tempo com 0
-//       rankingBuilder->ranking[i][j].tamanho = 0;      // Inicializa o tamanho com 0
-//     }
-//   }
-// }
-
 bool jogadoresSaoIguais(Jogador_t x, Jogador_t y)
 {
 	if (strcmp(x.nome, y.nome) || x.tamanho != y.tamanho || x.tempo != y.tempo)
@@ -28,15 +9,15 @@ bool jogadoresSaoIguais(Jogador_t x, Jogador_t y)
 }
 
 // Função que cria um gabarito para um jogo, não funciona sem a função criaJogo
-void criaGabarito(Tabuleiro_t *tabuleiro, int num_linhas)
+void criaGabarito(Tabuleiro_t *tabuleiro)
 {
 	srand(time(NULL));
 
 	// Gerando gabarito aleatorio
 
 	if (tabuleiro->dificuldade == 'f' || tabuleiro->dificuldade == 'F')
-		for (int i = 0; i < num_linhas; i++)
-			for (int j = 0; j < num_linhas; j++)
+		for (int i = 0; i < tabuleiro->tamanho; i++)
+			for (int j = 0; j < tabuleiro->tamanho; j++)
 			{
 				tabuleiro->gabarito[i][j] = rand() % 2;
 			}
@@ -49,43 +30,43 @@ void criaGabarito(Tabuleiro_t *tabuleiro, int num_linhas)
 
 		do
 		{
-			for (int i = 0; i < num_linhas; i++)
+			for (int i = 0; i < tabuleiro->tamanho; i++)
 			{
 				Validar_Soma_Linha = 0;
-				for (int j = 0; j < num_linhas; j++)
+				for (int j = 0; j < tabuleiro->tamanho; j++)
 				{
 					tabuleiro->gabarito[i][j] = rand() % 2;
 					if (tabuleiro->gabarito[i][j] == 1)
 					{
 						Validar_Soma_Linha++;
 					}
-					else if (j == num_linhas - 1 && (Validar_Soma_Linha == num_linhas || Validar_Soma_Linha == 0))
+					else if (j == tabuleiro->tamanho - 1 && (Validar_Soma_Linha == tabuleiro->tamanho || Validar_Soma_Linha == 0))
 						break;
 				}
-				if (Validar_Soma_Linha == num_linhas || Validar_Soma_Linha == 0)
+				if (Validar_Soma_Linha == tabuleiro->tamanho || Validar_Soma_Linha == 0)
 					break;
 			}
 
-			if (Validar_Soma_Linha == num_linhas || Validar_Soma_Linha == 0)
+			if (Validar_Soma_Linha == tabuleiro->tamanho || Validar_Soma_Linha == 0)
 				continue;
 
 			else
 			{
-				for (int i = 0; i < num_linhas; i++)
+				for (int i = 0; i < tabuleiro->tamanho; i++)
 				{
 					Validar_Soma_Coluna = 0;
-					for (int j = 0; j < num_linhas; j++)
+					for (int j = 0; j < tabuleiro->tamanho; j++)
 					{
 						if (tabuleiro->gabarito[j][i] == 1)
 							Validar_Soma_Coluna++;
-						else if (j == num_linhas - 1 && (Validar_Soma_Coluna == num_linhas || Validar_Soma_Coluna == 0))
+						else if (j == tabuleiro->tamanho - 1 && (Validar_Soma_Coluna == tabuleiro->tamanho || Validar_Soma_Coluna == 0))
 							break;
 					}
-					if (Validar_Soma_Coluna == num_linhas || Validar_Soma_Coluna == 0)
+					if (Validar_Soma_Coluna == tabuleiro->tamanho || Validar_Soma_Coluna == 0)
 						break;
 				}
 			}
-		} while (Validar_Soma_Linha == num_linhas || Validar_Soma_Coluna == num_linhas || Validar_Soma_Linha == 0 || Validar_Soma_Coluna == 0);
+		} while (Validar_Soma_Linha == tabuleiro->tamanho || Validar_Soma_Coluna == tabuleiro->tamanho || Validar_Soma_Linha == 0 || Validar_Soma_Coluna == 0);
 	}
 
 	else if (tabuleiro->dificuldade == 'd' || tabuleiro->dificuldade == 'D')
@@ -97,45 +78,45 @@ void criaGabarito(Tabuleiro_t *tabuleiro, int num_linhas)
 
 		do
 		{
-			for (int i = 0; i < num_linhas; i++)
+			for (int i = 0; i < tabuleiro->tamanho; i++)
 			{
 				Validar_Soma_Linha = 0;
-				for (int j = 0; j < num_linhas; j++)
+				for (int j = 0; j < tabuleiro->tamanho; j++)
 				{
 					tabuleiro->gabarito[i][j] = rand() % 2;
 					if (tabuleiro->gabarito[i][j] == 1)
 					{
 						Validar_Soma_Linha++;
 					}
-					else if (j == num_linhas - 1 && Validar_Soma_Linha == num_linhas)
+					else if (j == tabuleiro->tamanho - 1 && Validar_Soma_Linha == tabuleiro->tamanho)
 						break;
 				}
-				if (Validar_Soma_Linha == num_linhas)
+				if (Validar_Soma_Linha == tabuleiro->tamanho)
 					break;
 			}
 
-			if (Validar_Soma_Linha == num_linhas)
+			if (Validar_Soma_Linha == tabuleiro->tamanho)
 				continue;
 
 			else
 			{
-				for (int i = 0; i < num_linhas; i++)
+				for (int i = 0; i < tabuleiro->tamanho; i++)
 				{
 					Validar_Soma_Coluna = 0;
-					for (int j = 0; j < num_linhas; j++)
+					for (int j = 0; j < tabuleiro->tamanho; j++)
 					{
 						if (tabuleiro->gabarito[j][i] == 1)
 						{
 							Validar_Soma_Coluna++;
 						}
-						else if (j == num_linhas - 1 && Validar_Soma_Coluna == num_linhas)
+						else if (j == tabuleiro->tamanho - 1 && Validar_Soma_Coluna == tabuleiro->tamanho)
 							break;
 					}
-					if (Validar_Soma_Coluna == num_linhas)
+					if (Validar_Soma_Coluna == tabuleiro->tamanho)
 						break;
 				}
 			}
-		} while (Validar_Soma_Linha == num_linhas || Validar_Soma_Coluna == num_linhas);
+		} while (Validar_Soma_Linha == tabuleiro->tamanho || Validar_Soma_Coluna == tabuleiro->tamanho);
 	}
 	return;
 }
@@ -194,10 +175,9 @@ bool RankingWrite(Ranking_t _r_builder)
 // Função que imrprime o rank "sumplete.ini" e acrescenta os dados do jogador
 void Ranking(Jogador_t player)
 {
-	Jogador_t players_buffer[MAX_PLAYERS] = {};
-	char string[100], stringaux[100];
-	unsigned int size, contador_players = 0, j, i = 0, contador_size[6] = {0};
-	unsigned int player_pos;
+	char string[100];
+	int size = 3, j, i = 0;
+	int player_pos = 0;
 
 	Ranking_t r_builder = {};
 
@@ -231,11 +211,11 @@ void Ranking(Jogador_t player)
 			}
 		}
 
-#if DEBUG
-		// _Debug_printRankingBuilder(r_builder);
-			Debug_str("\nPLAYER TAMANHO = ")
-			printf("%d\n", player.tamanho);
-#endif
+		#if DEBUG
+				// _Debug_printRankingBuilder(r_builder);
+					Debug_str("\nPLAYER TAMANHO = ")
+					printf("%d\n", player.tamanho);
+		#endif
 
 		// Adicionando dados do jogador nos jogadores do ranking
 		j = 0;
@@ -333,11 +313,11 @@ void Ranking(Jogador_t player)
 void criaJogo(Tabuleiro_t *tabuleiro)
 {
 	// Alocando memoria para a matriz dos numeros do tabuleiro
-	criaMatriz(tabuleiro->tabela_numeros, tabuleiro->tamanho);
+	criaMatrizInt(&(tabuleiro->tabela_numeros), tabuleiro->tamanho);
 	// Alocando memoria para a matriz manipulada pelo usuario
-	criaMatriz(tabuleiro->tabela_usuario, tabuleiro->tamanho);
+	criaMatrizInt(&(tabuleiro->tabela_usuario), tabuleiro->tamanho);
 	// Alocando memoria para a matriz do gabarito
-	criaMatriz(tabuleiro->gabarito, tabuleiro->tamanho);
+	criaMatrizBool(&(tabuleiro->gabarito), tabuleiro->tamanho);
 
 	// Alocando memoria para a soma de linhas e colunas do tabuleiro
 	tabuleiro->somaColunas = calloc(tabuleiro->tamanho, sizeof(int));
@@ -370,7 +350,7 @@ void criaJogo(Tabuleiro_t *tabuleiro)
 	}
 
 	// Gerando matriz gabarito
-	criaGabarito(tabuleiro->gabarito, tabuleiro->tamanho);
+	criaGabarito(tabuleiro);
 
 	// Soma das linhas e colunas segundo o gabarito
 	for (int i = 0; i < tabuleiro->tamanho; i++)
@@ -401,7 +381,7 @@ void criaJogo(Tabuleiro_t *tabuleiro)
 }
 
 // Função que compara o gabarito com a matriz que está sendo manipulada pelo usuario
-bool Comparador(Tabuleiro_t *tabuleiro)
+bool JogadorGanhou(Tabuleiro_t *tabuleiro)
 {
 	for (int i = 0; i < tabuleiro->tamanho; i++)
 	{
@@ -411,50 +391,36 @@ bool Comparador(Tabuleiro_t *tabuleiro)
 				return false;
 		}
 	}
-	return true; // 1 significa que ganhou -> quando todos os elementos de matriz são iguasi aos de gabarito e iguais a zero
+	return true; // 1 significa que ganhou -> quando todos os elementos de matriz são iguais aos de gabarito e iguais a zero
 }
 
 // Função que faz as operações dos comandos
 
-int Comandos(char *comando)
+int ComandoParaNumero(char *entrada_usuario)
 {
-	if (strcmp(comando, "resolver\n") == 0)
+	if (strcmp(entrada_usuario, "resolver") == 0)
 		return 1;
 
-	else if (strcmp(comando, "dica\n") == 0)
+	else if (strcmp(entrada_usuario, "dica") == 0)
 		return 2;
 
 	else
 	{
 		for (int i = 0; i < MAX_STRING; i++)
 		{
-			if (comando[0] == 'm' && comando[1] == 'a' && comando[2] == 'n' && comando[3] == 't' && comando[4] == 'e' && comando[5] == 'r')
+			if (strcmp(entrada_usuario, "manter") == 0)
 				return 3;
-			else if (comando[0] == 's' && comando[1] == 'a' && comando[2] == 'l' && comando[3] == 'v' && comando[4] == 'a' && comando[5] == 'r')
+			else if (strcmp(entrada_usuario, "salvar") == 0)
 				return 4;
-			else if (comando[0] == 'v' && comando[1] == 'o' && comando[2] == 'l' && comando[3] == 't' && comando[4] == 'a' && comando[5] == 'r')
+			else if (strcmp(entrada_usuario, "voltar") == 0)
 				return 5;
-			else if (comando[0] == 'r' && comando[1] == 'e' && comando[2] == 'm' && comando[3] == 'o' && comando[4] == 'v' && comando[5] == 'e' && comando[6] == 'r')
+			else if (strcmp(entrada_usuario, "remover") == 0)
 				return 6;
 		}
 	}
 	return 0;
 }
 
-void ColetarDadosJogador(Jogador_t *jogador)
-{
-	printf(YELLOW("\nDigite o nome do jogador: "));
-	fgets(jogador->nome, MAX_STRING, stdin);
-
-	int i = 0; // tirando o \n do nome do jogador
-	while (jogador->nome[i] != '\n')
-	{
-		i++;
-	}
-	jogador->nome[i] = '\0';
-
-	return;
-}
 
 void ColetarDadosJogo(Tabuleiro_t *tabuleiro)
 {

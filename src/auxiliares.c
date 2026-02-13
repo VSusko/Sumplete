@@ -3,7 +3,7 @@
 
 
 //Função que aloca dinamicamente uma matriz
-void criaMatriz(int ***matriz, int nlines) 
+void criaMatrizInt(int ***matriz, int nlines) 
 {
     *matriz = malloc(nlines * sizeof(int *));
 
@@ -11,15 +11,35 @@ void criaMatriz(int ***matriz, int nlines)
     {
         (*matriz)[i] = malloc(nlines * sizeof(int));
     }
+    
+    return;
+}
+
+void criaMatrizBool(bool ***matriz, int nlines) 
+{
+    *matriz = malloc(nlines * sizeof(bool *));
+
+    for (int i = 0; i < nlines; i++) 
+    {
+        (*matriz)[i] = malloc(nlines * sizeof(bool));
+    }
+
+    return;
 }
 
 //Função que libera a memoria de uma matriz
-void liberaMatriz(int** matriz, int nlines)
+void liberaMatriz(void* matriz, int num_linhas)
 {
-    for(int i = 0; i < nlines; i++)
-        free(matriz[i]);
-    free(matriz);
+    void** m = (void**) matriz;
+
+    for(int i = 0; i < num_linhas; i++)
+        free(m[i]);
+
+    free(m);
+
+    return;
 }
+
 
 //Função que libera a memoria dos dados de um tabuleiro
 void liberaTabuleiro(Tabuleiro_t *tabuleiro)
@@ -29,6 +49,8 @@ void liberaTabuleiro(Tabuleiro_t *tabuleiro)
     liberaMatriz(tabuleiro->tabela_usuario, tabuleiro->tamanho);
     free(tabuleiro->somaColunas);
     free(tabuleiro->somaLinhas);
+
+    return;
 }
 
 void trocaJogadores(Jogador_t *a, Jogador_t *b)
@@ -36,4 +58,15 @@ void trocaJogadores(Jogador_t *a, Jogador_t *b)
     Jogador_t aux = *a;
     *a = *b;
     *b = aux;	
+
+    return;
+}
+
+
+void limpabuffer()
+{
+    char c;
+    while ((c = getchar()) != '\n' && c != EOF);
+    
+    return;
 }

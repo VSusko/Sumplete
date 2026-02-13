@@ -7,9 +7,7 @@
 int main()
 {
 	// String que será utilizada ao longo de todo o codigo para receber comandos
-	char comando[MAX_STRING];
-	// Variável que conta quantos elementos serão mantidos no jogo -> utilidade na função de dica
-	int contador_manter;
+	char entrada_usuario[2][MAX_STRING];
 	// Variavel que irá fazer os comandos do Menu
 	int acao = 0;
 	// Variável que irá contar quantas dicas já foram dadas
@@ -20,26 +18,25 @@ int main()
 	Jogador_t jogador;
 
 	Menu();
-	fgets(comando, MAX_STRING, stdin);
-	acao = comando[0] - '0';
-
-	while (acao < 0 || acao > 4 || comando[1] != '\n')
+	scanf("%d", &acao);
+	
+	// Validação da entrada do menu
+	while (acao < 0 || acao > 4)
 	{
-		printf(RED("\nAção inválida! Digite um número de 0 a 4: "));
-		fgets(comando, 30, stdin);
-		acao = comando[0] - '0';
+		printError("\nAção inválida! Digite um número de 0 a 4: ");
+		scanf("%d", &acao);
 	}
 
 	while (acao != 5)
 	{
-		contador_manter = 0, contadicas = 0, tabuleiro.dificuldade = 'c';
+		contadicas = 0, tabuleiro.dificuldade = 'c';
 
 		if (acao == 0)
 			return 0;
 
 		else if (acao == 1)
 		{
-			contador_manter = 0, contadicas = 0, tabuleiro.dificuldade = 'c'; // reset das variaveis
+			contadicas = 0, tabuleiro.dificuldade = 'c'; // reset das variaveis
 
 			fflush(stdin); // Função que limpa o buffer
 
@@ -48,23 +45,31 @@ int main()
 				tabuleiro.tamanho = 5;
 				tabuleiro.dificuldade = 'f';
 			#else
-				jogador = ColetarDadosJogador(jogador);			  // Entrada do nome do jogador
-				tabuleiro = ColetarDadosJogo(tabuleiro); // Entrada de dados do jogo
+				// Entrada do nome do jogador
+				printf(YELLOW("\nDigite o nome do jogador: "));
+				scanf("%s", jogador->nome);
+				limpabuffer();
+				// Entrada de dados do jogo
+				tabuleiro = ColetarDadosJogo(tabuleiro); 
 			#endif
 
 			criaJogo(&tabuleiro);
 			jogador.tamanho = tabuleiro.tamanho;
-			ImprimeTabuleiro(&tabuleiro);
 
+			// Mostra o tabuleiro para o jogador
+			ImprimeTabuleiro(&tabuleiro);
+			
+			// Comeca a contar o tempo do jogo
 			time_t begin = time(NULL);
 
-			while (Comparador(&tabuleiro) == 0)
+			while (JogadorGanhou(&tabuleiro) == false)
 			{
-				fgets(comando, MAX_STRING, stdin);
+				scanf("%s%s", entrada_usuario[0], entrada_usuario[1]);
+				limpabuffer();
 
-				int n = Comandos(comando);
-				
-				switch (n)
+				int num_comando = ComandoParaNumero(entrada_usuario[0]);
+
+				switch (num_comando)
 				{
 					case 0:
 						printf("\n\nComando ");
@@ -74,7 +79,7 @@ int main()
 					
 					// Comando Resolver
 					case 1:
-						Resolver(&tabuleiro, jogador, begin);
+						Resolver(&tabuleiro, &jogador, begin);
 						acao = 5;
 						break;
 					
@@ -85,12 +90,12 @@ int main()
 
 					// Comando Manter
 					case 3:
-						Manter(comando, &tabuleiro);
+						Manter(&tabuleiro, entrada_usuario[1]);
 						break;
 
 					// Comando Salvar
 					case 4:
-						Salvar(&tabuleiro, &jogador, comando, begin);
+						Salvar(&tabuleiro, &jogador, entrada_usuario[1], begin);
 						break;
 					
 					// Comando Voltar
@@ -100,7 +105,7 @@ int main()
 						
 					// Remover
 					case 6:
-						Remover(&tabuleiro, comando, &contadicas, &acao);
+						Remover(&tabuleiro, entrada_usuario[1], &contadicas, &acao);
 						break;
 						
 					default:
@@ -116,7 +121,6 @@ int main()
 			{
 				ImprimirFim(jogador, begin);
 				liberaTabuleiro(&tabuleiro);
-				liberaMatriz(tabuleiro.gabarito, tabuleiro.tamanho);
 				acao = 5;
 			}
 		}

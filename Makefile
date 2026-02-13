@@ -1,6 +1,6 @@
 # Compilador e flags
 CC = gcc
-CFLAGS = -g -Wall -Wextra -O2 -Isrc/include
+CFLAGS = -g -Wall -Wextra -Wno-unused-result -O2 -Isrc/include
 
 # Diretórios fonte e binario
 DIR_FONTE = src

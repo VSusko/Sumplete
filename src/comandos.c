@@ -7,7 +7,7 @@
 #include "interface.h"
 #include "auxiliares.h"
 
-void Resolver(Tabuleiro_t *tabuleiro, Jogador_t jogador, time_t begin)
+void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t begin)
 {
     for(int i = 0; i < tabuleiro->tamanho; i++)
         for(int j = 0; j < tabuleiro->tamanho; j++)
@@ -18,7 +18,9 @@ void Resolver(Tabuleiro_t *tabuleiro, Jogador_t jogador, time_t begin)
         }
     ImprimeTabuleiro(tabuleiro);
     time_t end = time(NULL);
-    jogador.tempo = end - begin;
+    jogador->tempo = end - begin;
+
+    return;
 }
 
 void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
@@ -57,9 +59,9 @@ void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
 }
 
 //Função que salva o jogo atual e os dados do jogador
-void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *comando, time_t begin)
+void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *entrada_usuario, time_t begin)
 {
-    if(comando[6] == '\n')
+    if(entrada_usuario[6] == '\n')
     {
         printf("\n\nFormato ");
         printf(RED("NÃO"));
@@ -70,10 +72,10 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *comando, time_t be
     {
         // Validando o formato do texto
         int t = 0;
-        while(comando[t] != '.')
+        while(entrada_usuario[t] != '.')
             t++;
 
-        if(comando[t+1] != 't' || comando[t+2] != 'x' || comando[t+3] != 't' || comando[t] != '.')
+        if(entrada_usuario[t+1] != 't' || entrada_usuario[t+2] != 'x' || entrada_usuario[t+3] != 't' || entrada_usuario[t] != '.')
         {
             printf("\n\nFormato ");
             printf(RED("NÃO"));
@@ -90,10 +92,10 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *comando, time_t be
     int i = 0, manterCount = 0, removerCount = 0;
     do
     {
-        nomesave[i] = comando[i+7];
+        nomesave[i] = entrada_usuario[i+7];
         i++;
     }
-    while(comando[i+7] != '\n');
+    while(entrada_usuario[i+7] != '\n');
     nomesave[i] = '\0';
 
     // ========== Salvando o jogo em um arquivo de texto ========== //
@@ -172,11 +174,11 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *comando, time_t be
     int t = 0;
     do
     {
-        printf(RED("%c"), comando[t+7]);
+        printf(RED("%c"), entrada_usuario[t+7]);
         t++;
     }
-    while(comando[t+7] != '\n');
-    comando[t+7] = '\0';
+    while(entrada_usuario[t+7] != '\n');
+    entrada_usuario[t+7] = '\0';
     printf(YELLOW(" com sucesso!\n\n"));
 
     return;
@@ -207,7 +209,7 @@ void Remover(Tabuleiro_t *tabuleiro, char *comando, int *contadicas, int *acao)
         (*contadicas)--;
     
     // Confere se o jogador ganhou o jogo naquele momento
-    if(Comparador(tabuleiro) == false) 
+    if(JogadorGanhou(tabuleiro) == false) 
     {
         ImprimeTabuleiro(tabuleiro);
         *acao = 5;
@@ -230,64 +232,53 @@ void Remover(Tabuleiro_t *tabuleiro, char *comando, int *contadicas, int *acao)
 
 void Voltar(Tabuleiro_t *tabuleiro, int *acao)
 {
-    char comando[MAX_STRING];
-    int op;
     Menu();
-    fgets(comando, MAX_STRING, stdin);
-    op = comando[0] - '0';
+    scanf("%d", acao);
+    limpabuffer();
 
-    while(op < 0 || op > 4 || comando[1] != '\n')
+    while(*acao < 0 || *acao > 4)
     {
-        printf(RED("\n\nComando inválido! Digite um número de 0 a 4: "));
-        fgets(comando, MAX_STRING, stdin);
-        op = comando[0] - '0';
+        printError("\n\nComando inválido! Digite um número de 0 a 4: ");
+        scanf("%d", acao);
+        limpabuffer();
     }
     
-    if (op == 0)
-    {
-        liberaTabuleiro(tabuleiro);
-    }
-    else if(op == 1)
-    {
-        liberaTabuleiro(tabuleiro);
-        *acao = 1;
-    }
-    else if(op == 2)
-    {
-        liberaTabuleiro(tabuleiro);
-        *acao = 2;
-    }
-    else if(op == 3)
+    if(*acao == 3)
     {
         ImprimeTabuleiro(tabuleiro);
         printf("\n");
         fflush(stdin);
+        return;
     }
-    else if(op == 4)
+    else if(*acao == 4)
     {
         printf("\n\n");
         ImprimirRanking();
         ImprimeTabuleiro(tabuleiro);
         printf("\n\n");
+        return;
+    }
+    else{
+        liberaTabuleiro(tabuleiro);
     }
 
     return;
 }
 
-void Manter(Tabuleiro_t *tabuleiro, char *comando)
+void Manter(Tabuleiro_t *tabuleiro, char *entrada_usuario)
 {
     int linha, coluna;
 
     // Validando o comando manter
-    if(comando[9] != '\n') 
+    if(entrada_usuario[9] != '\n') 
     {
         printError("\n\nEsse elemento não existe! Mantenha um elemento váldo:\n\n");
         return;
     }
 
     // Aritimética que transforma char para int
-    linha = (comando[7] - '0') - 1; 
-    coluna = (comando[8] - '0') - 1;
+    linha = (entrada_usuario[7] - '0') - 1; 
+    coluna = (entrada_usuario[8] - '0') - 1;
     
     // Mais uma validação de manter
     if(linha+1 > tabuleiro->tamanho || linha+1 < 1 || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)

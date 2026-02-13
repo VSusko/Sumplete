@@ -8,26 +8,22 @@
 #include "dbg.h"
 
 
-// void rankingInicia(RankingBuilder *rankingBuilder);
-
 bool jogadoresSaoIguais(Jogador_t x, Jogador_t y);
 
 void Ranking(Jogador_t player);
 
-int Comandos(char*);
+int ComandoParaNumero(char *entrada_usuario);
 
-bool Comparador(Tabuleiro_t*);
+bool JogadorGanhou(Tabuleiro_t*);
 
 void carregarJogo(Tabuleiro_t *tabuleiro, Jogador_t *player, int ***BackEnding);
 
 void criaJogo(Tabuleiro_t *tabuleiro);
 
-void criaGabarito(Tabuleiro_t *tabuleiro, int num_linhas);
-
-void ColetarDadosJogador(Jogador_t *jogador);
+void criaGabarito(Tabuleiro_t *tabuleiro);
 
 void ColetarDadosJogo(Tabuleiro_t *tabuleiro);
 
-bool RankingWrite(RankingBuilder);
+bool RankingWrite(Ranking_t RankingBuilder);
 
 #endif

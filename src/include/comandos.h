@@ -11,7 +11,7 @@
 #include "jogo.h"
 #include "cores.h"
 
-void Resolver(Tabuleiro_t *tabuleiro, Jogador_t player, time_t begin);
+void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *player, time_t begin);
     
 void Dica(Tabuleiro_t *tabuleiro, int *contadicas);
 

@@ -13,11 +13,11 @@ void ImprimirRanking();
 
 void ImprimirFim(Jogador_t, time_t);
 
-void MenuJogarNovamente(int*);
+void MenuJogarNovamente(int *acao);
 
-void ImprimirAcao3(int*);
+void ImprimirAcao3(int *acao);
 
-void ImprimirAcao4(int*);
+void ImprimirAcao4(int *acao);
 
 void ImprimirCabecalhoRanking();
 

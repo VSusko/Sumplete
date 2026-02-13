@@ -155,18 +155,14 @@ void ImprimirRanking()
 	{
 
 		Jogador_t *players;
-		char string[100], stringaux[100], igual;
-		int size, contador_players = 0, j, i = 0;
+		char linha[100];
+		int size = 3, contador_players = 0, j, i = 0;
 
 		// Cálculo de contagem dos jogadores
-		while (!feof(arquivo))
-		{
-			fgets(string, 100, arquivo);
-
-			if (string[0] == 'p')
+		while (fgets(linha, sizeof(linha), arquivo)) {
+			if (strncmp(linha, "player", 6) == 0) {
 				contador_players++;
-			else
-				continue;
+			}
 		}
 
 		fseek(arquivo, 0, SEEK_SET);
@@ -176,29 +172,29 @@ void ImprimirRanking()
 		// Coleta de dados dos jogadores
 		while (!feof(arquivo))
 		{
-			fgets(string, 100, arquivo);
+			fgets(linha, 100, arquivo);
 
-			if (string[0] == 's')
+			if (strncmp(linha, "size", 4) == 0)
 			{
-				size = string[7] - '0';
+				size = linha[7] - '0';
 			}
 
 			players[i].tamanho = size;
 
-			if (string[0] == 'p')
+			if (strncmp(linha, "player", 6) == 0)
 			{
 				j = 0;
-				while (string[j + 10] != '\0')
+				while (linha[j + 10] != '\0')
 				{
-					players[i].nome[j] = string[j + 10];
+					players[i].nome[j] = linha[j + 10];
 					j++;
 				}
 				players[i].nome[j - 1] = '\0';
 			}
 
-			if (string[0] == 't')
+			if (strncmp(linha, "time", 4) == 0)
 			{
-				sscanf(string, "%s %c %ld", stringaux, &igual, &players[i].tempo);
+				sscanf(linha, "%*s %*c %ld", &players[i].tempo);
 				i++;
 			}
 		}
@@ -261,23 +257,21 @@ void Menu()
 	printf(YELLOW(" para retornar ao menu.\n\n"));
 }
 
-void ImprimirFim(Jogador_t player, time_t begin)
+void ImprimirFim(Jogador_t jogador, time_t begin)
 {
 	time_t end = time(NULL);
-	player.tempo = end - begin; // coleta do tempo do jogador
+	jogador.tempo = end - begin; // coleta do tempo do jogador
 	printf(CYAN("\nFIM DE JOGO!!\n"));
 	printf("\nTempo gasto pelo jogador ");
-	printf(BOLD(YELLOW("%s")), player.nome);
+	printf(BOLD(YELLOW("%s")), jogador.nome);
 	printf(": ");
-	printf(MAGENTA("%ld"), player.tempo);
+	printf(MAGENTA("%ld"), jogador.tempo);
 	printf(" segundos.\n\n\n");
-	Ranking(player);
+	Ranking(jogador);
 }
 
 void MenuJogarNovamente(int *acao)
 {
-	char comando[MAX_STRING];
-
 	printf(YELLOW("\nDeseja jogar novamente?"));
 	printf(YELLOW("\nDigite "));
 	printf(RED("1"));
@@ -285,51 +279,40 @@ void MenuJogarNovamente(int *acao)
 	printf(RED("0"));
 	printf(YELLOW(" para sair do jogo:\n\n"));
 
-	fgets(comando, MAX_STRING, stdin);
-	int op = comando[0] - '0';
+	scanf("%d", acao);
+	limpabuffer();
 
-	while ((op != 0 && op != 1) || comando[1] != '\n')
+	while (*acao != 0 || *acao != 1)
 	{
-		printf("\n\nComando ");
-		printf(RED("inválido."));
+		printError("\nComando inválido.");
 		printf(YELLOW("\nDigite "));
 		printf(RED("1"));
 		printf(YELLOW(" para jogar novamente ou "));
 		printf(RED("0"));
 		printf(YELLOW(" para sair do jogo:\n\n"));
-		fgets(comando, MAX_STRING, stdin);
-		op = comando[0] - '0';
+		scanf("%d", acao);
+		limpabuffer();
 	}
 
-	if (op == 0)
-	{
-		*acao = 0;
-		return;
-	}
-
-	else if (op == 1)
+	if (*acao == 1)
 	{
 		Menu();
-		fgets(comando, MAX_STRING, stdin);
-		*acao = comando[0] - '0';
-
-		while (*acao < 0 || *acao > 4 || comando[1] != '\n')
+		scanf("%d", acao);
+		limpabuffer();
+		while (*acao < 0 || *acao > 4)
 		{
-			printf(RED("\nAção inválida! Digite um número de 0 a 4: "));
-			fgets(comando, 30, stdin);
-			*acao = comando[0] - '0';
+			printError("\nAção inválida! Digite um número de 0 a 4: ");
+			scanf("%d", acao);
+			limpabuffer();
 		}
 	}
+
+	return;
 }
 
 void ImprimirAcao3(int *acao)
 {
-	char comando[MAX_STRING];
-
-	printf("\n\nVocê ainda ");
-	printf(RED("não"));
-	printf(" começou nenhum jogo.\n\n");
-	printf(YELLOW("\nAções:\n"));
+	printf(YELLOW("\n\nAções:\n"));
 	printf(("\n0 |"));
 	printf(YELLOW(" Sair do jogo"));
 	printf(("\n1 |"));
@@ -341,46 +324,29 @@ void ImprimirAcao3(int *acao)
 	printf(YELLOW("\n\nDurante o jogo digite "));
 	printf(RED("“voltar”"));
 	printf(YELLOW(" para retornar ao menu.\n\n"));
-	fgets(comando, MAX_STRING, stdin);
-	int op = comando[0] - '0';
+	printError("\nVocê ainda não começou nenhum jogo. Selecione uma das opções mostradas: ");
 
-	while (comando[1] != '\n' || op < 0 || op > 4 || op == 3)
-	{
-		if (comando[1] != '\n' || op < 0 || op > 4)
-			printf(RED("\nComando inválido!"));
-		else if (op == 3)
-			printf(RED("\nVocê ainda não começou nenhum jogo. Selecione uma das opções mostradas: "));
+	scanf("%d", acao);
+	limpabuffer();
 
-		fgets(comando, MAX_STRING, stdin);
-		op = comando[0] - '0';
+	while (*acao < 0 || *acao > 4 || *acao == 3)
+	{
+		if (*acao < 0 || *acao > 4){
+			printError("\nComando inválido!. Selecione uma das opções mostradas: ");
+		}
+		else if (*acao == 3){	
+			printError("\nVocê ainda não começou nenhum jogo. Selecione uma das opções mostradas: ");
+		}
+
+		scanf("%d", acao);
+		limpabuffer();
 	}
 
-	if (op == 0)
-	{
-		*acao = 0;
-		return;
-	}
-	else if (op == 1)
-	{
-		*acao = 1;
-		return;
-	}
-	else if (op == 2)
-	{
-		*acao = 2;
-		return;
-	}
-	else if (op == 4)
-	{
-		*acao = 4;
-		return;
-	}
+	return;
 }
 
 void ImprimirAcao4(int *acao)
 {
-	char comando[MAX_STRING];
-
 	printf("\n\n");
 	ImprimirRanking();
 	printf(YELLOW("\nAções:\n"));
@@ -395,13 +361,14 @@ void ImprimirAcao4(int *acao)
 	printf(YELLOW("\n\nDurante o jogo digite "));
 	printf(RED("“voltar”"));
 	printf(YELLOW(" para retornar ao menu.\n\n"));
-	fgets(comando, MAX_STRING, stdin);
-	*acao = comando[0] - '0';
-	while (comando[1] != '\n' || *acao < 0 || *acao > 4)
+
+	scanf("%d", acao);
+	limpabuffer();
+	while (*acao < 0 || *acao > 4)
 	{
-		printf(RED("\n\nComando inválido!\n\n"));
-		fgets(comando, MAX_STRING, stdin);
-		*acao = comando[0] - '0';
+		printError("\nComando inválido!. Selecione uma das opções mostradas:");
+		scanf("%d", acao);
+		limpabuffer();
 	}
 }
 

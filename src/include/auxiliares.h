@@ -47,12 +47,16 @@ typedef struct
     Jogador_t ranking[NUM_TABULEIROS][MAX_JOGADORES_POR_DIFF];
 } Ranking_t; 
 
-void criaMatriz(int***, int);
+void criaMatrizInt(int***, int);
 
-void liberaMatriz(int**, int);
+void criaMatrizBool(bool***, int);
+
+void liberaMatriz(void* matriz, int num_linhas);
 
 void liberaTabuleiro(Tabuleiro_t*);
 
 void trocaJogadores(Jogador_t*, Jogador_t*);
+
+void limpabuffer();
 
 #endif
