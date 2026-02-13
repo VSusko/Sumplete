@@ -47,7 +47,7 @@ typedef struct
     Jogador_t ranking[NUM_TABULEIROS][MAX_JOGADORES_POR_DIFF];
 } Ranking_t; 
 
-void criaMatrizInt(int***, int);
+void criaMatrizInt(int ***matriz, int numero_linhas);
 
 void criaMatrizBool(bool***, int);
 

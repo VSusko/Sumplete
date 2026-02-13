@@ -205,7 +205,7 @@ void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, i
     if(JogadorGanhou(tabuleiro) == false) 
     {
         ImprimeTabuleiro(tabuleiro);
-        *acao = 5;
+        *acao = 0;
         return;
     }
     // O jogador venceu, todos os elemtos mantidos serão imprimidos em verde

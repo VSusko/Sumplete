@@ -14,6 +14,30 @@ void ImprimeComandos()
 	printf(RED(" voltar\n\n"));
 }
 
+void Valida_acao(int *acao)
+{
+	while (scanf("%d", acao) == 0 || *acao < 0 || *acao > 3){
+			printError("\nAção inválida! Digite um número de 0 a 3: ");
+			limpabuffer();
+	}
+}
+
+
+void ValidaNomeArquivo(char *nome_do_arquivo)
+{
+	while (scanf("%s", nome_do_arquivo) == 0)
+    {
+        int tamanho_nome = strlen(nome_do_arquivo);
+        if(nome_do_arquivo[tamanho_nome-1] != 't' || nome_do_arquivo[tamanho_nome-2] != 'x' || nome_do_arquivo[tamanho_nome-3] != 't' || nome_do_arquivo[tamanho_nome-4] != '.'){   
+            printError("\nFormato NÃO suportado! Digite o nome do arquivo.txt: ");
+        }
+        else{
+            printError("\nERRO! Digite apenas o nome do arquivo: ");
+        }
+        limpabuffer();
+    }
+}
+
 // Função responsável por imprimir um jogo, recebe uma variavel do tipo tabuleiro
 void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 {

@@ -3,25 +3,25 @@
 
 
 //Função que aloca dinamicamente uma matriz
-void criaMatrizInt(int ***matriz, int nlines) 
+void criaMatrizInt(int ***matriz, int numero_linhas) 
 {
-    *matriz = malloc(nlines * sizeof(int *));
+    *matriz = malloc(numero_linhas * sizeof(int *));
 
-    for (int i = 0; i < nlines; i++) 
+    for (int i = 0; i < numero_linhas; i++) 
     {
-        (*matriz)[i] = malloc(nlines * sizeof(int));
+        (*matriz)[i] = malloc(numero_linhas * sizeof(int));
     }
     
     return;
 }
 
-void criaMatrizBool(bool ***matriz, int nlines) 
+void criaMatrizBool(bool ***matriz, int numero_linhas) 
 {
-    *matriz = malloc(nlines * sizeof(bool *));
+    *matriz = malloc(numero_linhas * sizeof(bool *));
 
-    for (int i = 0; i < nlines; i++) 
+    for (int i = 0; i < numero_linhas; i++) 
     {
-        (*matriz)[i] = malloc(nlines * sizeof(bool));
+        (*matriz)[i] = calloc(numero_linhas,  sizeof(bool));
     }
 
     return;

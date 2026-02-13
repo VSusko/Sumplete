@@ -3,6 +3,10 @@
 
 #include "auxiliares.h"
 
+void Valida_acao(int *acao);
+
+void ValidaNomeArquivo(char *nome_do_arquivo);
+
 void Menu();
 
 void MenuVoltar();

@@ -3,6 +3,7 @@
 #include "comandos.h"
 #include "interface.h"
 #include "dbg.h"
+#include "carregarjogo.h"
 
 int main()
 {
@@ -31,8 +32,8 @@ int main()
 			
 			// Carregar jogo salvo
 			case 2:
-				CarregarJogoSalvo(&tabuleiro, &jogador, &acao);
-				// MenuJogarNovamente(&acao);
+				ContinuarJogo(&tabuleiro, &jogador, &acao);
+				MenuJogarNovamente(&acao);
 				break;
 
 			// Exibir Ranking

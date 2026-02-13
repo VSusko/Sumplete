@@ -8,8 +8,6 @@
 #include "dbg.h"
 #include "comandos.h"
 
-void Valida_acao(int *acao);
-
 bool jogadoresSaoIguais(Jogador_t x, Jogador_t y);
 
 void Ranking(Jogador_t player);
@@ -28,7 +26,6 @@ bool RankingWrite(Ranking_t RankingBuilder);
 
 void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao);
 
-void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao);
 
 
 #endif

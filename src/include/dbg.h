@@ -3,7 +3,7 @@
 
 #include "auxiliares.h"
     
-#define DEBUG 0
+#define DEBUG 1
 
 #define Debug_str(string)       printf(FG_RGB(0, 0, 255) _BOLD string RESET);
 #define Debug_mark              printf(FG_RGB(255, 255, 0) _BOLD "[DEBUG] " RESET);

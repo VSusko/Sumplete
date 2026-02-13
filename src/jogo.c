@@ -1,12 +1,5 @@
 #include "jogo.h"
 
-void Valida_acao(int *acao)
-{
-	while (scanf("%d", acao) == 0 || *acao < 0 || *acao > 3){
-			printError("\nAção inválida! Digite um número de 0 a 3: ");
-			limpabuffer();
-	}
-}
 
 bool jogadoresSaoIguais(Jogador_t x, Jogador_t y)
 {
@@ -220,9 +213,9 @@ void Ranking(Jogador_t player)
 		}
 
 		#if DEBUG
-				// _Debug_printRankingBuilder(r_builder);
-					Debug_str("\nPLAYER TAMANHO = ")
-					printf("%d\n", player.tamanho);
+			// _Debug_printRankingBuilder(r_builder);
+			Debug_str("\nPLAYER TAMANHO = ")
+			printf("%d\n", player.tamanho);
 		#endif
 
 		// Adicionando dados do jogador nos jogadores do ranking
@@ -298,9 +291,9 @@ void Ranking(Jogador_t player)
 			}
 		}
 
-#if DEBUG
-		_Debug_printRankingandPlayer(r_builder, player);
-#endif
+		#if DEBUG
+			_Debug_printRankingandPlayer(r_builder, player);
+		#endif
 
 		// Imprimindo o ranking no terminal - cabeçalho
 		ImprimirCabecalhoRanking();
@@ -391,41 +384,41 @@ void criaJogo(Tabuleiro_t *tabuleiro)
 // Função que compara o gabarito com a matriz que está sendo manipulada pelo usuario
 bool JogadorGanhou(Tabuleiro_t *tabuleiro)
 {
-	for (int i = 0; i < tabuleiro->tamanho; i++)
-	{
-		for (int j = 0; j < tabuleiro->tamanho; j++)
-		{
-			if (tabuleiro->gabarito[i][j] == 0 && tabuleiro->tabela_usuario[i][j] != 0)
-				return false;
-		}
-	}
-	return true; // 1 significa que ganhou -> quando todos os elementos de matriz são iguais aos de gabarito e iguais a zero
+	int somaLinha, somaColuna;
+    for(int i = 0; i < tabuleiro->tamanho; i++)
+    {
+        somaLinha = 0;
+        somaColuna = 0;
+        for(int j = 0; j < tabuleiro->tamanho; j++)
+        {
+            if (tabuleiro->tabela_usuario[i][j] == 1 || tabuleiro->tabela_usuario[i][j] == 2)
+                somaLinha += tabuleiro->tabela_numeros[i][j];
+            if (tabuleiro->tabela_usuario[j][i] == 1 || tabuleiro->tabela_usuario[j][i] == 2)
+                somaColuna += tabuleiro->tabela_numeros[j][i];
+        }
+        if(tabuleiro->somaLinhas[i] != somaLinha || tabuleiro->somaColunas[i] != somaColuna)
+            return false;
+    }
+
+    return true;
 }
 
 // Função que faz as operações dos comandos
-
 int ComandoParaNumero(char *entrada_usuario)
 {
 	if (strcmp(entrada_usuario, "resolver") == 0)
 		return 1;
-
 	else if (strcmp(entrada_usuario, "dica") == 0)
 		return 2;
-
-	else
-	{
-		for (int i = 0; i < MAX_STRING; i++)
-		{
-			if (strcmp(entrada_usuario, "manter") == 0)
-				return 3;
-			else if (strcmp(entrada_usuario, "salvar") == 0)
-				return 4;
-			else if (strcmp(entrada_usuario, "voltar") == 0)
-				return 5;
-			else if (strcmp(entrada_usuario, "remover") == 0)
-				return 6;
-		}
-	}
+	else if (strcmp(entrada_usuario, "manter") == 0)
+		return 3;
+	else if (strcmp(entrada_usuario, "salvar") == 0)
+		return 4;
+	else if (strcmp(entrada_usuario, "voltar") == 0)
+		return 5;
+	else if (strcmp(entrada_usuario, "remover") == 0)
+		return 6;
+		
 	return 0;
 }
 
@@ -492,9 +485,9 @@ void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 	tabuleiro->dificuldade = 'c'; 
 
 	#if DEBUG
-		strcpy(jogador.nome, "SUQUINHO");
-		tabuleiro.tamanho = 5;
-		tabuleiro.dificuldade = 'f';
+		strcpy(jogador->nome, "SUQUINHO");
+		tabuleiro->tamanho = 3;
+		tabuleiro->dificuldade = 'f';
 		limpabuffer();
 	#else
 		// Entrada do nome do jogador
@@ -567,14 +560,4 @@ void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 	ImprimirFim(jogador, tempo_ini);
 	liberaTabuleiro(tabuleiro);
 	*acao = 0;
-}
-
-
-void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
-{
-	tabuleiro->dificuldade = 'c';
-	jogador->tamanho = 0;
-	*acao = *acao;
-	printError("\nCarregar jogo salvo ainda não implementado!\n");
-	return;
 }
