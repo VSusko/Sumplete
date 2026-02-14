@@ -15,15 +15,17 @@
 
 #define MAX_STRING 50
 #define MAX_PLAYERS 30
-#define NUM_TABULEIROS 7
+#define NUMERO_DE_TABULEIROS 7
 #define MAX_JOGADORES_POR_DIFF 5
 #define RANKING_PATH "ranking/sumplete.ini"
 
 //Struct com informações de um tabuleiro
 typedef struct
 {
-    int *somaLinhas;  //soma de cada uma das linhas do tabuleiro
-    int *somaColunas; //soma de cada uma das colunas do tabuleiro
+    int *somaLinhasTabela;  //soma de cada uma das linhas do tabuleiro
+    int *somaColunasTabela; //soma de cada uma das colunas do tabuleiro
+    int *somaLinhasUsuario;  //soma de cada uma das linhas do tabuleiro feita pelo usuario
+    int *somaColunasUsuario; //soma de cada uma das colunas do tabuleiro feita pelo usuario
     int tamanho;      //tamanho do tabuleiro
     int **tabela_numeros;     //matriz do tabuleiro
     int **tabela_usuario;     //matriz do tabuleiro que o usuário irá manipular
@@ -42,9 +44,9 @@ typedef struct
 
 typedef struct
 {
-    int jogadores_por_categoria[NUM_TABULEIROS];    
+    int num_jogadores_por_categoria[NUMERO_DE_TABULEIROS];
     int total_jogadores;
-    Jogador_t ranking[NUM_TABULEIROS][MAX_JOGADORES_POR_DIFF];
+    Jogador_t ranking[NUMERO_DE_TABULEIROS][MAX_JOGADORES_POR_DIFF];
 } Ranking_t; 
 
 void criaMatrizInt(int ***matriz, int numero_linhas);

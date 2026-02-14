@@ -122,7 +122,7 @@ void criaGabarito(Tabuleiro_t *tabuleiro)
 	return;
 }
 
-bool RankingWrite(Ranking_t _r_builder)
+bool SalvarRanking(Ranking_t *construtor_ranking)
 {
 	/*
 	  Variáveis para armazenar as posições do último jogador a ser gravado no ranking.
@@ -130,86 +130,93 @@ bool RankingWrite(Ranking_t _r_builder)
 	  pois caso isso aconteça, na próxima leitura de ranking a linha vazia será lida e preenchida como sendo
 	  um jogador existente.
 	*/
-	Jogador_t ultimo;
+	// Jogador_t ultimo;
 
 	// Abrindo o arquivo em modo escrita
-	FILE *gravar = fopen(RANKING_PATH, "w");
+	FILE *arquivo = fopen(RANKING_PATH, "w");
 
 	// Caso não seja possível abrir o arquivo
-	if (gravar == NULL)
+	if (arquivo == NULL)
+	{
+		printError("\nNão foi possível abrir o arquivo de ranking para escrita!\n");
 		return false;
+	}
 
 	// Procurando pelo último jogador
-	for (int i = 0; i < NUM_TABULEIROS; i++)
-	{
-		if (_r_builder.jogadores_por_categoria[i] != 0)
-		{
-			ultimo = _r_builder.ranking[i][_r_builder.jogadores_por_categoria[i] - 1];
-		}
-	}
+	// for (int i = 0; i < NUMERO_DE_TABULEIROS; i++)
+	// {
+	// 	if (construtor_ranking->jogadores_por_categoria[i] != 0)
+	// 	{
+	// 		ultimo = construtor_ranking->ranking[i][construtor_ranking->jogadores_por_categoria[i] - 1];
+	// 	}
+	// }
 
-	for (int i = 0; i < NUM_TABULEIROS; i++)
+	for (int i = 0; i < NUMERO_DE_TABULEIROS; i++)
 	{
 		// Caso não tenha jogadores numa categoria, pular para a próxima
-		if (_r_builder.jogadores_por_categoria[i] == 0)
+		if (construtor_ranking->num_jogadores_por_categoria[i] == 0)
 			continue;
 
-		fprintf(gravar, "size = %d\n", i + 3);
-		for (int j = 0; j < _r_builder.jogadores_por_categoria[i]; j++)
+		fprintf(arquivo, "size = %d\n", i + 3);
+		for(int j = 0; j < construtor_ranking->num_jogadores_por_categoria[i]; j++)
 		{
-			fprintf(gravar, "player%d = %s\n", j + 1, _r_builder.ranking[i][j].nome);
+			fprintf(arquivo, "player%d = %s\n", j + 1, construtor_ranking->ranking[i][j].nome);
 
-			if (jogadoresSaoIguais(ultimo, _r_builder.ranking[i][j]))
-				fprintf(gravar, "time%d = %ld", j + 1, _r_builder.ranking[i][j].tempo);
+			if (j == construtor_ranking->num_jogadores_por_categoria[i] - 1)
+				fprintf(arquivo, "time%d = %ld", j + 1, construtor_ranking->ranking[i][j].tempo);
 			else
-				fprintf(gravar, "time%d = %ld\n", j + 1, _r_builder.ranking[i][j].tempo);
+				fprintf(arquivo, "time%d = %ld\n", j + 1, construtor_ranking->ranking[i][j].tempo);
 		}
 
-		if (i != NUM_TABULEIROS - 1)
-			fprintf(gravar, "\n");
+		fprintf(arquivo, "\n");
 	}
-	fclose(gravar);
+	fclose(arquivo);
 
 	return true;
 }
 
-// Função que imrprime o rank "sumplete.ini" e acrescenta os dados do jogador
-void Ranking(Jogador_t player)
+// Função que faz o rank "sumplete.ini" e acrescenta os dados do jogador
+void ConstroiRanking(Jogador_t *jogador)
 {
-	char string[100];
-	int size = 3, j, i = 0;
-	int player_pos = 0;
+	char linha[MAX_STRING];
+	char arg1[MAX_STRING/2];
+	char arg2[MAX_STRING/2];
 
-	Ranking_t r_builder = {};
+	int tamanho_atual = 3, pos_jogador = 0;
+
+	Ranking_t construtor_ranking = {0};
 
 	FILE *arquivo = fopen(RANKING_PATH, "r");
 	if (arquivo != NULL)
 	{
 		// Coleta de dados dos jogadores
-
 		while (!feof(arquivo))
 		{
-			fgets(string, 100, arquivo);
+			// le a linha
+			fgets(linha, sizeof(linha), arquivo);
+			// obtem os argumentos da linha
+			sscanf(linha, "%s = %s", arg1, arg2);
 
-			if (string[0] == 's')
-			{
-				size = string[7] - '0';
-				i = 0;
+			// se a linha for "size", o tamanho atual é atualizado
+			if(strncmp(arg1, "size", 4) == 0) {
+				tamanho_atual = (arg2[0] - '0') - 3;
+				pos_jogador = 0;
 			}
-
-			if (string[0] == 'p')
-			{
-				sscanf(string, "%*s %*c %s", r_builder.ranking[size - 3][i].nome);
-				r_builder.ranking[size - 3][i].tamanho = size;
+			
+			// se a linha for "player", o nome do jogador é adicionado no ranking builder
+			if(strncmp(arg1, "player", 6) == 0) {
+				construtor_ranking.ranking[tamanho_atual][pos_jogador].tamanho = tamanho_atual;
+				strcpy(construtor_ranking.ranking[tamanho_atual][pos_jogador].nome, arg2);
 			}
-
-			if (string[0] == 't')
-			{
-				sscanf(string, "%*s %*c %ld", &r_builder.ranking[size - 3][i].tempo);
-				r_builder.total_jogadores++;
-				r_builder.jogadores_por_categoria[size - 3]++;
-				i++;
+			
+			// se a linha for "time", coleta o tempo do jogadore atualiza contadores
+			if(strncmp(arg1, "time", 4) == 0) {
+				construtor_ranking.ranking[tamanho_atual][pos_jogador].tempo = atol(arg2);
+				pos_jogador++;
+				construtor_ranking.total_jogadores++;
+				construtor_ranking.num_jogadores_por_categoria[tamanho_atual]++;
 			}
+			
 		}
 
 		#if DEBUG
@@ -219,90 +226,38 @@ void Ranking(Jogador_t player)
 		#endif
 
 		// Adicionando dados do jogador nos jogadores do ranking
-		j = 0;
-		for (i = 0; i < NUM_TABULEIROS; i++)
+		for (int i = 0; i < NUMERO_DE_TABULEIROS; i++)
 		{
-			// Caso não seja a categoria do jogador, pegue a proxima
-			if (player.tamanho != i + 3)
-				continue;
-
-			// Caso a categoria está cheia e o jogador teve um tempo maior que o último colocado, o jogador não entra no ranking e o loop encerra
-			if (r_builder.jogadores_por_categoria[i] == MAX_JOGADORES_POR_DIFF &&
-				player.tempo > r_builder.ranking[i][r_builder.jogadores_por_categoria[i] - 1].tempo)
-				break;
-
-			// Caso a categoria esteja vazia, o jogador será inserido na primeira posição
-			if (r_builder.jogadores_por_categoria[i] == 0)
+			// Se for a categoria do jogador
+			if(jogador->tamanho == i+3)
 			{
-				r_builder.ranking[i][0] = player;
-				r_builder.jogadores_por_categoria[i]++;
-				r_builder.total_jogadores++;
-				break;
-			}
-
-			// Caso uma categoria não esteja cheia e o tempo do jogador seja o último da categoria, ele será inserido na ultima posição
-			if (r_builder.jogadores_por_categoria[i] < MAX_JOGADORES_POR_DIFF &&
-				player.tempo >= r_builder.ranking[i][r_builder.jogadores_por_categoria[i] - 1].tempo)
-			{
-				r_builder.ranking[i][r_builder.jogadores_por_categoria[i]] = player;
-				r_builder.jogadores_por_categoria[i]++;
-				r_builder.total_jogadores++;
-				break;
-			}
-
-			/*
-			  Último caso: o jogador fez um tempo melhor do que o último colocado. É preciso percorrer
-			  os jogadores da categoria para encontrar a posição do jogador no ranking. Depois de encontrada essa posição,
-			  a posição dos outros jogadores no ranking deve ser reajustada
-			*/
-			if (player.tempo < r_builder.ranking[i][r_builder.jogadores_por_categoria[i] - 1].tempo)
-			{
-				// Percorrendo os jogadores do ranking
-				for (j = 0; j < r_builder.jogadores_por_categoria[i]; j++)
+				// Procura a posição correta do jogador na categoria de acordo com o tempo gasto para resolver o jogo
+				for(int j = 0; j < construtor_ranking.num_jogadores_por_categoria[i]; j++)
 				{
-					// Se o tempo do jogador for melhor do que o jogador da iteração, ele deve ser encaixado nessa posição
-					if (player.tempo < r_builder.ranking[i][j].tempo)
+					if(jogador->tempo < construtor_ranking.ranking[i][j].tempo)
 					{
-						player_pos = j; // Pegando a posição do jogador
+						// Deslocando os jogadores para baixo para adicionar o jogador atual na posição correta
+						for(int k = construtor_ranking.num_jogadores_por_categoria[i]-1; k > j; k--)
+						{
+							construtor_ranking.ranking[i][k] = construtor_ranking.ranking[i][k-1];
+						}
+						// Adicionando o jogador atual na posição correta
+						construtor_ranking.ranking[i][j] = *jogador;
 						break;
 					}
 				}
-
-				// Caso a categoria ainda não esteja cheia, o número de jogadores nessa categoria aumenta
-				if (r_builder.jogadores_por_categoria[i] < MAX_JOGADORES_POR_DIFF)
-				{
-					r_builder.jogadores_por_categoria[i]++;
-					r_builder.total_jogadores++;
-				}
-
-				// j recebe a posição do último jogador dessa categoria
-				j = r_builder.jogadores_por_categoria[i] - 1;
-
-				// Enquanto j for maior que a posição do jogador, os demais jogadores serão empurrados para baixo
-				while (j > player_pos)
-				{
-					r_builder.ranking[i][j] = r_builder.ranking[i][j - 1];
-					j--;
-				}
-
-				// A posição do jogador no ranking é sobrescrita com os dados do jogador
-				r_builder.ranking[i][player_pos] = player;
-				break;
 			}
 		}
 
-		#if DEBUG
-			_Debug_printRankingandPlayer(r_builder, player);
-		#endif
-
-		// Imprimindo o ranking no terminal - cabeçalho
-		ImprimirCabecalhoRanking();
-
-		// Imprimindo ranking no terminal - corpo do ranking
-		ImprimirCorpoRanking(&r_builder, player);
+		// #if DEBUG
+			// _Debug_printRankingandPlayer(r_builder, player);
+		// #endif
 
 		// Gravando os dados do ranking no arquivo
-		RankingWrite(r_builder);
+		SalvarRanking(&construtor_ranking);
+
+		// Imprimindo ranking no terminal - corpo do ranking
+		ExibirRankingFim(&construtor_ranking, jogador);
 	}
 	else
 		printError("\nO arquivo ""sumplete.ini"" não existe!\n")
@@ -321,8 +276,11 @@ void criaJogo(Tabuleiro_t *tabuleiro)
 	criaMatrizBool(&(tabuleiro->gabarito), tabuleiro->tamanho);
 
 	// Alocando memoria para a soma de linhas e colunas do tabuleiro
-	tabuleiro->somaColunas = calloc(tabuleiro->tamanho, sizeof(int));
-	tabuleiro->somaLinhas = calloc(tabuleiro->tamanho, sizeof(int));
+	tabuleiro->somaColunasTabela = calloc(tabuleiro->tamanho, sizeof(int));
+	tabuleiro->somaLinhasTabela = calloc(tabuleiro->tamanho, sizeof(int));
+
+	tabuleiro->somaColunasUsuario = calloc(tabuleiro->tamanho, sizeof(int));
+	tabuleiro->somaLinhasUsuario = calloc(tabuleiro->tamanho, sizeof(int));
 
 	// Gerando semente aleatória para os números e a soma
 	srand(time(NULL));
@@ -360,9 +318,11 @@ void criaJogo(Tabuleiro_t *tabuleiro)
 		{
 			if (tabuleiro->gabarito[i][j] == true)
 			{
-				tabuleiro->somaLinhas[i] += tabuleiro->tabela_numeros[i][j];
-				tabuleiro->somaColunas[j] += tabuleiro->tabela_numeros[i][j];
+				tabuleiro->somaLinhasTabela[i] += tabuleiro->tabela_numeros[i][j];
+				tabuleiro->somaColunasTabela[j] += tabuleiro->tabela_numeros[i][j];
 			}
+			tabuleiro->somaColunasUsuario[j] += tabuleiro->tabela_numeros[i][j];
+			tabuleiro->somaLinhasUsuario[i] += tabuleiro->tabela_numeros[i][j];
 		}
 	}
 
@@ -381,24 +341,14 @@ void criaJogo(Tabuleiro_t *tabuleiro)
 	return;
 }
 
-// Função que compara o gabarito com a matriz que está sendo manipulada pelo usuario
 bool JogadorGanhou(Tabuleiro_t *tabuleiro)
 {
-	int somaLinha, somaColuna;
-    for(int i = 0; i < tabuleiro->tamanho; i++)
-    {
-        somaLinha = 0;
-        somaColuna = 0;
-        for(int j = 0; j < tabuleiro->tamanho; j++)
-        {
-            if (tabuleiro->tabela_usuario[i][j] == 1 || tabuleiro->tabela_usuario[i][j] == 2)
-                somaLinha += tabuleiro->tabela_numeros[i][j];
-            if (tabuleiro->tabela_usuario[j][i] == 1 || tabuleiro->tabela_usuario[j][i] == 2)
-                somaColuna += tabuleiro->tabela_numeros[j][i];
-        }
-        if(tabuleiro->somaLinhas[i] != somaLinha || tabuleiro->somaColunas[i] != somaColuna)
-            return false;
-    }
+	for(int i = 0; i < tabuleiro->tamanho; i++)
+	{
+		if (tabuleiro->somaLinhasTabela[i] != tabuleiro->somaLinhasUsuario[i] 
+			|| tabuleiro->somaColunasTabela[i] != tabuleiro->somaColunasUsuario[i])
+			return false;
+	}
 
     return true;
 }
@@ -482,12 +432,13 @@ void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 
 	// Variável que irá contar quantas dicas já foram dadas
 	int contadicas = 0;
+	bool usou_resolver = false;
 	tabuleiro->dificuldade = 'c'; 
 
 	#if DEBUG
 		strcpy(jogador->nome, "SUQUINHO");
-		tabuleiro->tamanho = 3;
-		tabuleiro->dificuldade = 'f';
+		tabuleiro->tamanho = 9;
+		tabuleiro->dificuldade = 'd';
 		limpabuffer();
 	#else
 		// Entrada do nome do jogador
@@ -502,7 +453,7 @@ void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 	jogador->tamanho = tabuleiro->tamanho;
 
 	// Mostra o tabuleiro para o jogador
-	ImprimeTabuleiro(tabuleiro);
+	ExibirTabuleiro(tabuleiro);
 	
 	// Comeca a contar o tempo do jogo
 	time_t tempo_ini = time(NULL);
@@ -522,6 +473,7 @@ void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 			// Comando Resolver
 			case 1:
 				Resolver(tabuleiro, jogador, tempo_ini);
+				usou_resolver = true;
 				*acao = 0;
 				break;
 			
@@ -557,7 +509,7 @@ void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 				break;
 		}
 	}
-	ImprimirFim(jogador, tempo_ini);
+	TelaDeFim(jogador, tempo_ini, usou_resolver);
 	liberaTabuleiro(tabuleiro);
 	*acao = 0;
 }

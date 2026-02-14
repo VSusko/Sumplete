@@ -1,11 +1,10 @@
-
 #include "interface.h"
 #include "jogo.h"
 
 // Função que imprime os comandos do jogo
-void ImprimeComandos()
+void ExibirComandos()
 {
-	printf(YELLOW("\n\nComandos:"));
+	printf(BOLD(YELLOW("\n\nComandos:")));
 	printf(GREEN(" resolver,"));
 	printf(BLUE(" dica,"));
 	printf(CYAN(" manter,"));
@@ -13,6 +12,14 @@ void ImprimeComandos()
 	printf(" salvar,");
 	printf(RED(" voltar\n\n"));
 }
+
+
+void ImprimeTabTela(int quantidade_tabs)
+{
+	for(int i = 0; i < quantidade_tabs; i++)
+		printf(" ");
+}
+
 
 void Valida_acao(int *acao)
 {
@@ -39,9 +46,30 @@ void ValidaNomeArquivo(char *nome_do_arquivo)
 }
 
 // Função responsável por imprimir um jogo, recebe uma variavel do tipo tabuleiro
-void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
+void ExibirTabuleiro(Tabuleiro_t *tabuleiro)
 {
+	#if DEBUG
+		// printf("Soma das linhas do tabuleiro: ");
+		// for(int i = 0; i < tabuleiro->tamanho; i++){
+		// 	printf("%d ", tabuleiro->somaLinhasUsuario[i]);
+		// }
+		// printf("\n");
+
+
+
+		// printf("Soma das colunas do tabuleiro: ");
+		// for(int i = 0; i < tabuleiro->tamanho; i++){
+		// 	printf("%d ", tabuleiro->somaColunasUsuario[i]);
+		// }
+		// printf("\n");
+
+		// printf("Dificuldade do jogo: %c\n", tabuleiro->dificuldade);
+	#endif
+
+
 	// Imprimindo o tabuleiro - 1 linha
+	ImprimeTabTela(tabuleiro->tamanho);
+
 	int size = tabuleiro->tamanho + 2;
 
 	printf(TAB_TL);
@@ -60,6 +88,8 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 	printf("\n");
 
 	// Imprimindo o tabuleiro - 2 linha
+	ImprimeTabTela(tabuleiro->tamanho);
+
 	printf(TAB_VER "       " TAB_VER);
 
 	for (int i = 0; i < tabuleiro->tamanho; i++)
@@ -71,6 +101,8 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 	printf("\n");
 
 	// Imprimindo o tabuleiro - 3 linha
+	ImprimeTabTela(tabuleiro->tamanho);
+
 	printf(TAB_ML);
 	for (int i = 1; i < size; i++)
 	{
@@ -90,6 +122,7 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 	// Imprimindo o tabuleiro - matriz principal
 	for (int i = 0; i < tabuleiro->tamanho; i++)
 	{
+		ImprimeTabTela(tabuleiro->tamanho);
 		printf(TAB_VER "  %2d   " TAB_VER, i + 1);
 		for (int j = 0; j < tabuleiro->tamanho; j++)
 		{
@@ -99,14 +132,30 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 				printf(GREEN("  %2d   ") TAB_VER, tabuleiro->tabela_numeros[i][j]);
 			else if (tabuleiro->tabela_usuario[i][j] == 0)
 				printf(RED("  %2d   ") TAB_VER, tabuleiro->tabela_numeros[i][j]);
+
 		}
-		if (tabuleiro->somaLinhas[i] < -9)
-			printf(YELLOW(" %2d   ") TAB_VER, tabuleiro->somaLinhas[i]);
-		else
-			printf(YELLOW("  %2d   ") TAB_VER, tabuleiro->somaLinhas[i]); // soma de cada linha
+		if (tabuleiro->somaLinhasTabela[i] < -9){
+			if(tabuleiro->somaLinhasTabela[i] == tabuleiro->somaLinhasUsuario[i]){
+				printf(BOLD(YELLOW(" %2d   ")) TAB_VER, tabuleiro->somaLinhasTabela[i]);
+			}
+			else{
+				printf(YELLOW(" %2d   ") TAB_VER, tabuleiro->somaLinhasTabela[i]);
+			}
+		}
+		else{
+			if(tabuleiro->somaLinhasTabela[i] == tabuleiro->somaLinhasUsuario[i]){
+				printf(BOLD(YELLOW("  %2d   ")) TAB_VER, tabuleiro->somaLinhasTabela[i]); // soma de cada linha
+			}
+			else{
+				printf(YELLOW("  %2d   ") TAB_VER, tabuleiro->somaLinhasTabela[i]); // soma de cada linha
+			}
+
+		}
 		printf("\n");
 
 		// Divisorias das linhas
+		ImprimeTabTela(tabuleiro->tamanho);
+
 		if (i < tabuleiro->tamanho - 1)
 		{
 			printf(TAB_ML);
@@ -142,20 +191,33 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 	printf("\n");
 
 	// Imprimindo o tabuleiro - penultima linha
+	ImprimeTabTela(tabuleiro->tamanho);
+
 	printf(TAB_VER "       " TAB_VER);
 
 	for (int i = 0; i < tabuleiro->tamanho; i++)
 	{
-		if (tabuleiro->somaColunas[i] < -9)
-			printf(YELLOW("  %2d  ") TAB_VER, tabuleiro->somaColunas[i]);
-		else
-			printf(YELLOW("  %2d   ") TAB_VER, tabuleiro->somaColunas[i]); // soma de cada coluna
+		if (tabuleiro->somaColunasTabela[i] < -9){
+			if(tabuleiro->somaColunasTabela[i] == tabuleiro->somaColunasUsuario[i])
+				printf(BOLD(YELLOW("  %2d  ")) TAB_VER, tabuleiro->somaColunasTabela[i]);
+			else
+				printf(YELLOW("  %2d  ") TAB_VER, tabuleiro->somaColunasTabela[i]);
+		}
+		else{
+			if(tabuleiro->somaColunasTabela[i] == tabuleiro->somaColunasUsuario[i])
+				printf(BOLD(YELLOW("  %2d   ")) TAB_VER, tabuleiro->somaColunasTabela[i]); // soma de cada coluna
+			else{
+				printf(YELLOW("  %2d   ") TAB_VER, tabuleiro->somaColunasTabela[i]); // soma de cada coluna
+			}
+		}
 	}
 	printf("       " TAB_VER);
 
 	printf("\n");
 
 	// Imprimindo o tabuleiro - ultima linha
+	ImprimeTabTela(tabuleiro->tamanho);
+
 	printf(TAB_BL);
 	for (int i = 1; i < size; i++)
 	{
@@ -168,92 +230,7 @@ void ImprimeTabuleiro(Tabuleiro_t *tabuleiro)
 		printf(TAB_HOR);
 	printf(TAB_BR);
 
-	ImprimeComandos();
-}
-
-// Função que apenas imprime o rank do arquivo "sumplete.ini"
-void ExibirRanking()
-{
-	FILE *arquivo = fopen(RANKING_PATH, "r");
-	if (arquivo != NULL)
-	{
-
-		Jogador_t *players;
-		char linha[100];
-		int size = 3, contador_players = 0, j, i = 0;
-
-		// Cálculo de contagem dos jogadores
-		while (fgets(linha, sizeof(linha), arquivo)) {
-			if (strncmp(linha, "player", 6) == 0) {
-				contador_players++;
-			}
-		}
-
-		fseek(arquivo, 0, SEEK_SET);
-
-		players = malloc(contador_players * sizeof(Jogador_t));
-
-		// Coleta de dados dos jogadores
-		while (!feof(arquivo))
-		{
-			fgets(linha, 100, arquivo);
-
-			if (strncmp(linha, "size", 4) == 0)
-			{
-				size = linha[7] - '0';
-			}
-
-			players[i].tamanho = size;
-
-			if (strncmp(linha, "player", 6) == 0)
-			{
-				j = 0;
-				while (linha[j + 10] != '\0')
-				{
-					players[i].nome[j] = linha[j + 10];
-					j++;
-				}
-				players[i].nome[j - 1] = '\0';
-			}
-
-			if (strncmp(linha, "time", 4) == 0)
-			{
-				sscanf(linha, "%*s %*c %ld", &players[i].tempo);
-				i++;
-			}
-		}
-
-		// Imprimindo o ranking no terminal - cabeçalho
-		ImprimirCabecalhoRanking();
-
-		// imprimindo ranking no terminal - ranking
-		int sizemax = 1;
-
-		for (int i = 0; i < contador_players; i++)
-		{
-			if (sizemax > 5)
-			{
-				sizemax = 1;
-				continue;
-			}
-			if (sizemax == 1)
-				printf(RED("\nsize = %d\n"), players[i].tamanho);
-
-			printf("player%d = %s\n", sizemax, players[i].nome);
-			printf("time%d = %ld\n", sizemax, players[i].tempo);
-
-			if (players[i + 1].tamanho > players[i].tamanho)
-				sizemax = 1;
-			else
-				sizemax++;
-		}
-
-		free(players);
-	}
-	else
-		printf("\nO arquivo ""sumplete.ini"" não existe!\n");
-
-	fclose(arquivo);
+	ExibirComandos();
 }
 
 // Função Menu
@@ -282,7 +259,7 @@ void MenuVoltar()
 	printf(YELLOW("\n\nDurante o jogo digite "));printf(RED("“voltar”"));printf(YELLOW(" para retornar ao menu.\n\n"));
 }
 
-void ImprimirFim(Jogador_t *jogador, time_t tempo_ini)
+void TelaDeFim(Jogador_t *jogador, time_t tempo_ini, bool usou_resolver)
 {
 	time_t tempo_fim = time(NULL);
 	jogador->tempo = tempo_fim - tempo_ini; // coleta do tempo do jogador
@@ -292,7 +269,14 @@ void ImprimirFim(Jogador_t *jogador, time_t tempo_ini)
 	printf(": ");
 	printf(MAGENTA("%ld"), jogador->tempo);
 	printf(" segundos.\n\n\n");
-	Ranking(*jogador);
+
+	if(usou_resolver)
+	{
+		ExibirRanking();
+		printf(RED("\n\nVOCÊ USOU O COMANDO RESOLVER, ENTÃO VOCÊ NÃO ENTRARÁ PARA O RANKING!\n\n"));
+		return;
+	}
+	ConstroiRanking(jogador);
 }
 
 void MenuJogarNovamente(int *acao)
@@ -332,6 +316,7 @@ void MenuJogarNovamente(int *acao)
 
 void ImprimirCabecalhoRanking()
 {
+	ImprimeTabTela(TAB_TELA);
 	printf("\t" TAB_TL);
 	for (int i = 0; i < 23; i++)
 	{
@@ -341,8 +326,11 @@ void ImprimirCabecalhoRanking()
 			printf(TAB_HOR);
 	}
 	printf(TAB_TR "\n");
+	ImprimeTabTela(TAB_TELA);
 	printf("\t" TAB_VER BLUE(" RANKING DOS JOGADORES ") TAB_VER);
-	printf("\n\t" TAB_BL);
+	printf("\n");
+	ImprimeTabTela(TAB_TELA);
+	printf("\t" TAB_BL);
 	for (int i = 0; i < 23; i++)
 	{
 		if (i % 2 == 0)
@@ -351,29 +339,81 @@ void ImprimirCabecalhoRanking()
 			printf(TAB_HOR);
 	}
 	printf(TAB_BR "\n");
+
 }
 
-void ImprimirCorpoRanking(Ranking_t *_r_builder, Jogador_t _player)
+// Função que apenas imprime o rank do arquivo "sumplete.ini"
+void ExibirRanking()
 {
-	for (int i = 0; i < NUM_TABULEIROS; i++)
+	FILE *arquivo = fopen(RANKING_PATH, "r");
+	if (arquivo == NULL)
+	{
+		printError("\nO arquivo \"sumplete.ini\" não existe!\n");
+		return;
+	}
+
+	char linha[MAX_STRING];
+	char arg1[MAX_STRING/2];
+	char arg2[MAX_STRING/2];
+
+	bool primeiroSize = true;
+
+	ImprimirCabecalhoRanking();
+
+	while (fgets(linha, sizeof(linha), arquivo) != NULL)
+	{
+		if (sscanf(linha, "%s = %s", arg1, arg2) != 2)
+			continue;
+
+		if (strcmp(arg1, "size") == 0)
+		{
+			if (!primeiroSize)
+				printf("\n");  // espaço apenas entre categorias
+
+			printf(_PURPLE("size = %s\n"), arg2);
+			primeiroSize = false;
+		}
+		else if (strncmp(arg1, "player", 6) == 0)
+		{
+			int numero;
+			sscanf(arg1, "player%d", &numero);
+			printf(_LIGHT_PURPLE("player%d = %s\n"), numero, arg2);
+		}
+		else if (strncmp(arg1, "time", 4) == 0)
+		{
+			int numero;
+			sscanf(arg1, "time%d", &numero);
+			printf(_LIGHT_PURPLE("time%d = %s\n"), numero, arg2);
+		}
+	}
+
+	fclose(arquivo);
+}
+
+
+void ExibirRankingFim(Ranking_t *construtor_ranking, Jogador_t *jogador)
+{
+	ImprimirCabecalhoRanking();
+
+	for (int i = 0; i < NUMERO_DE_TABULEIROS; i++)
 	{
 		// Caso não tenha jogadores numa categoria, pular para a próxima
-		if (_r_builder->jogadores_por_categoria[i] == 0)
+		if (construtor_ranking->num_jogadores_por_categoria[i] == 0)
 			continue;
 
 		printf(_PURPLE("\nsize = %d\n"), i + 3);
-		for (int j = 0; j < _r_builder->jogadores_por_categoria[i]; j++)
+		for (int j = 0; j < construtor_ranking->num_jogadores_por_categoria[i]; j++)
 		{
-			if (jogadoresSaoIguais(_player, _r_builder->ranking[i][j]))
+			if (jogadoresSaoIguais(*jogador, construtor_ranking->ranking[i][j]))
 			{
 				printf(_CYAN("SUA COLOCAÇÃO:\n"));
-				printf(_CYAN("player%d = %s\n"), j + 1, _r_builder->ranking[i][j].nome);
-				printf(_CYAN("time%d = %ld\n"), j + 1, _r_builder->ranking[i][j].tempo);
+				printf(_CYAN("player%d = %s\n"), j + 1, construtor_ranking->ranking[i][j].nome);
+				printf(_CYAN("time%d = %ld\n"), j + 1, construtor_ranking->ranking[i][j].tempo);
 			}
 			else
 			{
-				printf(_LIGHT_PURPLE("player%d = %s\n"), j + 1, _r_builder->ranking[i][j].nome);
-				printf(_LIGHT_PURPLE("time%d = %ld\n"), j + 1, _r_builder->ranking[i][j].tempo);
+				printf(_LIGHT_PURPLE("player%d = %s\n"), j + 1, construtor_ranking->ranking[i][j].nome);
+				printf(_LIGHT_PURPLE("time%d = %ld\n"), j + 1, construtor_ranking->ranking[i][j].tempo);
 			}
 		}
 	}

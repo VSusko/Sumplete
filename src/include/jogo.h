@@ -10,7 +10,7 @@
 
 bool jogadoresSaoIguais(Jogador_t x, Jogador_t y);
 
-void Ranking(Jogador_t player);
+void ConstroiRanking(Jogador_t *player);
 
 int ComandoParaNumero(char *entrada_usuario);
 
@@ -22,7 +22,7 @@ void criaGabarito(Tabuleiro_t *tabuleiro);
 
 void ColetarDadosJogo(Tabuleiro_t *tabuleiro);
 
-bool RankingWrite(Ranking_t RankingBuilder);
+bool SalvarRanking(Ranking_t *construtor_ranking);
 
 void ComecarNovoJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao);
 

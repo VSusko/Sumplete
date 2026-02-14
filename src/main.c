@@ -27,13 +27,15 @@ int main()
 			// Começar um novo jogo
 			case 1:
 				ComecarNovoJogo(&tabuleiro, &jogador, &acao);
-				MenuJogarNovamente(&acao);
+				if(acao != 0)
+					MenuJogarNovamente(&acao);
 				break;
 			
 			// Carregar jogo salvo
 			case 2:
 				ContinuarJogo(&tabuleiro, &jogador, &acao);
-				MenuJogarNovamente(&acao);
+				if(acao != 0)
+					MenuJogarNovamente(&acao);
 				break;
 
 			// Exibir Ranking

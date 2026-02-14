@@ -10,13 +10,25 @@
 void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t tempo_ini)
 {
     for(int i = 0; i < tabuleiro->tamanho; i++)
+    {
+        tabuleiro->somaLinhasUsuario[i] = 0;
+        tabuleiro->somaColunasUsuario[i] = 0;
+    }    
+    
+    for(int i = 0; i < tabuleiro->tamanho; i++)
+    {
         for(int j = 0; j < tabuleiro->tamanho; j++)
         {
             tabuleiro->tabela_usuario[i][j] = tabuleiro->gabarito[i][j];
             if(tabuleiro->gabarito[i][j] == 1)
+            {
                 tabuleiro->tabela_usuario[i][j] = 2;
+                tabuleiro->somaLinhasUsuario[i] += tabuleiro->tabela_numeros[i][j];
+                tabuleiro->somaColunasUsuario[j] += tabuleiro->tabela_numeros[i][j];
+            }
         }
-    ImprimeTabuleiro(tabuleiro);
+    }
+    ExibirTabuleiro(tabuleiro);
     time_t tempo_fim = time(NULL);
     jogador->tempo = tempo_fim - tempo_ini;
 
@@ -55,7 +67,7 @@ void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
     printf(" Coluna: ");
     printf(GREEN("%d\n"), coluna+1);
 
-    ImprimeTabuleiro(tabuleiro);
+    ExibirTabuleiro(tabuleiro);
 }
 
 //Função que salva o jogo atual e os dados do jogador
@@ -115,12 +127,12 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *nome_do_save, time
 
     // Soma das linhas do tabuleiro
     for(i = 0; i < tabuleiro->tamanho; i++) 
-        fprintf(save, "%d ", tabuleiro->somaLinhas[i]);
+        fprintf(save, "%d ", tabuleiro->somaLinhasTabela[i]);
     fprintf(save, "\n");
 
     // Soma das colunas do tabuleiro
     for(i = 0; i < tabuleiro->tamanho; i++) 
-        fprintf(save, "%d ", tabuleiro->somaColunas[i]);
+        fprintf(save, "%d ", tabuleiro->somaColunasTabela[i]);
     fprintf(save, "\n");
 
     // Contando quantos elementos o jogador manteve e removeu
@@ -197,6 +209,8 @@ void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, i
     }
 
     tabuleiro->tabela_usuario[linha][coluna] = 0;
+    tabuleiro->somaLinhasUsuario[linha] -= tabuleiro->tabela_numeros[linha][coluna];
+    tabuleiro->somaColunasUsuario[coluna] -= tabuleiro->tabela_numeros[linha][coluna];
 
     if(tabuleiro->tabela_usuario[linha][coluna] == 0 && tabuleiro->gabarito[linha][coluna] == 1)
         (*contadicas)--;
@@ -204,7 +218,7 @@ void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, i
     // Confere se o jogador ganhou o jogo naquele momento
     if(JogadorGanhou(tabuleiro) == false) 
     {
-        ImprimeTabuleiro(tabuleiro);
+        ExibirTabuleiro(tabuleiro);
         *acao = 0;
         return;
     }
@@ -219,7 +233,7 @@ void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, i
             }
         }
 
-    ImprimeTabuleiro(tabuleiro);
+    ExibirTabuleiro(tabuleiro);
     return;
 }
 
@@ -240,13 +254,13 @@ void Voltar(Tabuleiro_t *tabuleiro, int *acao)
     {
         printf("\n\n");
         ExibirRanking();
-        ImprimeTabuleiro(tabuleiro);
+        ExibirTabuleiro(tabuleiro);
         printf("\n\n");
         return;
     }
     else if(*acao == 4)
     {
-        ImprimeTabuleiro(tabuleiro);
+        ExibirTabuleiro(tabuleiro);
         printf("\n");
         limpabuffer();
         return;
@@ -272,5 +286,7 @@ void Manter(Tabuleiro_t *tabuleiro, char *elemento_mantido)
     }
 
     tabuleiro->tabela_usuario[linha][coluna] = 2;
-    ImprimeTabuleiro(tabuleiro);
+    tabuleiro->somaLinhasUsuario[linha] += tabuleiro->tabela_numeros[linha][coluna];
+    tabuleiro->somaColunasUsuario[coluna] += tabuleiro->tabela_numeros[linha][coluna];
+    ExibirTabuleiro(tabuleiro);
 }

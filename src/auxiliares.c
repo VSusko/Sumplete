@@ -47,8 +47,10 @@ void liberaTabuleiro(Tabuleiro_t *tabuleiro)
     liberaMatriz(tabuleiro->gabarito, tabuleiro->tamanho);
     liberaMatriz(tabuleiro->tabela_numeros, tabuleiro->tamanho);
     liberaMatriz(tabuleiro->tabela_usuario, tabuleiro->tamanho);
-    free(tabuleiro->somaColunas);
-    free(tabuleiro->somaLinhas);
+    free(tabuleiro->somaColunasTabela);
+    free(tabuleiro->somaLinhasTabela);
+    free(tabuleiro->somaColunasUsuario);
+    free(tabuleiro->somaLinhasUsuario);
 
     return;
 }
