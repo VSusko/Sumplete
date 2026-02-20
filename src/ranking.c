@@ -1,4 +1,5 @@
 #include "ranking.h"
+#include "dbg.h"
 
 bool SalvarRanking(Ranking_t *construtor_ranking)
 {

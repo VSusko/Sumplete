@@ -13,9 +13,8 @@
 #include <string.h>
 #include "cores.h"
 
-#define TAB_TELA 50 // macro para o deslocamento do tabuleiro
-
 #define MAX_STRING 50 // tamanho maximo de strings
+#define TAB_TELA 50 // macro para o deslocamento do tabuleiro
 #define NUMERO_DE_TABULEIROS 7 // numero de tabuleiros diferentes (começa como tamanho 3 até tamanho 9, totalizando 7)
 #define MAX_JOGADORES_POR_DIFF 5 // numero maximo de jogadores por tamanho
 
@@ -42,6 +41,14 @@ typedef struct
     long pontuacao;        //pontuacao obtida pelo jogador
     int tamanho;           //tamanho do tabuleiro
 } Jogador_t;
+
+/**
+ * @brief Função que compara se dois jogadores são iguais (mesmo nome, tamanho e pontuacao)
+ * @param x jogador 1
+ * @param y jogador 2
+ * @returns true, se os jogadores sao iguais; false, caso contrário 
+ */
+bool jogadoresSaoIguais(Jogador_t x, Jogador_t y);
 
 /**
  * @brief Função que aloca dinamicamente uma matriz de inteiros

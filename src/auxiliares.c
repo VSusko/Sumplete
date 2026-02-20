@@ -1,6 +1,14 @@
 #include "auxiliares.h"
 #include "novojogo.h"
 
+bool jogadoresSaoIguais(Jogador_t x, Jogador_t y)
+{
+	// Verifica se possui mesmo nome, mesmo tamanho e mesma pontuacao
+	if (strcmp(x.nome, y.nome) || x.tamanho != y.tamanho || x.pontuacao != y.pontuacao)
+		return false;
+
+	return true;
+}
 
 void criaMatrizInt(int ***matriz, int numero_linhas) 
 {

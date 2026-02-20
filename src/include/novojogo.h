@@ -16,14 +16,6 @@
 
 
 /**
- * @brief Função que compara se dois jogadores são iguais (mesmo nome, tamanho e pontuacao)
- * @param x jogador 1
- * @param y jogador 2
- * @returns true, se os jogadores sao iguais; false, caso contrário 
- */
-bool jogadoresSaoIguais(Jogador_t x, Jogador_t y);
-
-/**
  * @brief Função que recebe um comando e devolve um inteiro representativo do comando requisitado
  * @param entrada_usuario Uma string que possui o comando digitado pelo usuario
  * @returns 1, se o comando for resolver; 2, se o comando for dica; 3, se o comando for manter; 4, se o comando for salvar; 5, se o comando for voltar; 6, se o comando for remover

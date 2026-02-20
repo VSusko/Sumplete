@@ -8,6 +8,7 @@
 #define ranking_h
 
 #include "auxiliares.h"
+#include "interface.h"
 
 #define RANKING_PATH "ranking/sumplete.ini" // Caminho do arquivo do ranking
 
