@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "jogo.h": "c",
+        "novojogo.h": "c",
         "tabuleiro.h": "c",
         "time.h": "c",
         "dbg.h": "c",

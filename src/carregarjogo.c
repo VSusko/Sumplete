@@ -1,17 +1,25 @@
 #include "carregarjogo.h"
 
 
-void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
+bool CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
 {
     char nome_do_arquivo[MAX_STRING/2];
     char caminho_do_arquivo[MAX_STRING];
 
     int contador_manter, contador_remover;
 
-    printf(YELLOW("\nDigite o nome do arquivo salvo (ex: save.txt): "));
+    printf(YELLOW("\nDigite o nome do arquivo salvo"));
+    printf(" (ex: save.txt) ");
+    printf(YELLOW("ou digite "));
+    printf("0 ");
+    printf(YELLOW("para voltar ao menu principal: "));
 
     ValidaNomeArquivo(nome_do_arquivo);
     
+    // Se o jogador quer voltar
+    if(!strcmp(nome_do_arquivo,"0"))
+        return false;
+
     // Concatenando o caminho do arquivo com o nome do arquivo
     strcpy(caminho_do_arquivo, CAMINHO_SAVES);
     strcat(caminho_do_arquivo, nome_do_arquivo);
@@ -19,9 +27,9 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
     FILE *arquivo;
     while ((arquivo = fopen(caminho_do_arquivo, "r")) == NULL)
     {
-        printError("\nArquivo não encontrado! Digite um nome de arquivo válido: ");
+        printError("\nArquivo não encontrado! Digite um nome de arquivo válido ou 0 para voltar: ");
         ValidaNomeArquivo(nome_do_arquivo);
-        return;
+        return false;
     }
 
     // Lendo o tamanho do tabuleiro
@@ -29,7 +37,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
     {
         printError("\nErro ao ler o arquivo! O tamanho do tabuleiro é inválido.\n");
         fclose(arquivo);
-        return;
+        return false;
     }
 
     // Alocando memoria para a matriz dos numeros do tabuleiro
@@ -62,7 +70,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
             {
                 printError("\nErro ao ler o arquivo! Número do tabuleiro inexistenet.\n");
                 fclose(arquivo);
-                return;
+                return false;
             }
             tabuleiro->somaLinhasUsuario[i] += tabuleiro->tabela_numeros[i][j];
             tabuleiro->somaColunasUsuario[j] += tabuleiro->tabela_numeros[i][j];
@@ -76,7 +84,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
         {
             printError("\nErro ao ler o arquivo! Sem soma de linhas!\n");
             fclose(arquivo);
-            return;
+            return false;
         }
     }
 
@@ -87,7 +95,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
         {
             printError("\nErro ao ler o arquivo! Sem soma de colunas!\n");
             fclose(arquivo);
-            return;
+            return false;
         }
     }
 
@@ -96,7 +104,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
     {
         printError("\nErro ao ler o arquivo! O formato do arquivo é inválido.\n");
         fclose(arquivo);
-        return;
+        return false;
     }
 
     // Inserindo elementos que o jogador escolheu manter na matriz do usuário
@@ -107,7 +115,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
         {
             printError("\nErro ao ler o arquivo! Elemento inexistente!.\n");
             fclose(arquivo);
-            return;
+            return false;
         }
         tabuleiro->tabela_usuario[linha-1][coluna-1] = 2;
     }
@@ -117,7 +125,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
     {
         printError("\nErro ao ler o arquivo! O formato do arquivo é inválido.\n");
         fclose(arquivo);
-        return;
+        return false;
     }
 
     // Inserindo elementos que o jogador escolheu remover na matriz do usuário
@@ -128,7 +136,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
         {
             printError("\nErro ao ler o arquivo! Elemento inexistente!\n");
             fclose(arquivo);
-            return;
+            return false;
         }
         tabuleiro->tabela_usuario[linha-1][coluna-1] = 0;
         tabuleiro->somaLinhasUsuario[linha-1] -= tabuleiro->tabela_numeros[linha-1][coluna-1];
@@ -140,7 +148,7 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
     {
         printError("\nErro ao ler o arquivo! Sem nome do jogador.\n");
         fclose(arquivo);
-        return;
+        return false;
     }
 
     // Coletando o tempo gasto pelo jogador até aquele momento
@@ -148,75 +156,156 @@ void CarregarJogoSalvo(Tabuleiro_t *tabuleiro, Jogador_t *jogador)
     {
         printError("\nErro ao ler o arquivo! Sem o tempo do jogador.\n");
         fclose(arquivo);
-        return;
+        return false;
     }
-
-    return;
-}
-
-bool VerificaGabarito(Tabuleiro_t *tabuleiro)
-{
-    int somaLinha, somaColuna;
-    for(int i = 0; i < tabuleiro->tamanho; i++)
+    
+    if (fscanf(arquivo, "%c", &tabuleiro->dificuldade) == 0)
     {
-        somaLinha = 0;
-        somaColuna = 0;
-        for(int j = 0; j < tabuleiro->tamanho; j++)
-        {
-            somaLinha += tabuleiro->tabela_numeros[i][j];
-            somaColuna += tabuleiro->tabela_numeros[j][i];
-        }
-        if(tabuleiro->somaLinhasTabela[i] != somaLinha || tabuleiro->somaColunasTabela[i] != somaColuna)
-            return false;
+        printError("\nErro ao ler o arquivo! Sem a dificuldade do jogo.\n");
+        fclose(arquivo);
+        return false;
     }
 
     return true;
 }
 
-
-void EncontraGabarito(Acha_gabarito_t *inst, int linha, int coluna, bool *acabou)
+bool VerificaGabarito(Encontra_gabarito_t *inst)
 {
-    if(linha == inst->tabuleiro->tamanho || coluna == inst->tabuleiro->tamanho)
+    // Itera sobre as somas
+    for (int i = 0; i < inst->tabuleiro->tamanho; i++)
     {
-        if(VerificaGabarito(inst->tabuleiro) == true)
-        {
-            *acabou = true;
-            return;
-        }
+        // Se alguma soma não bate, retorna falso
+        if (inst->soma_acumulada_linha[i] != inst->tabuleiro->somaLinhasTabela[i] ||
+            inst->soma_acumulada_coluna[i] != inst->tabuleiro->somaColunasTabela[i])
+                return false;
     }
-
-    for(int i = linha; i < inst->tabuleiro->tamanho; i++)
-    {
-        for(int j = coluna; j < inst->tabuleiro->tamanho; j++)
-        {
-            if(inst->tabuleiro->tabela_numeros[linha][coluna] + inst->soma_acumulada_linha[linha] <= inst->tabuleiro->somaLinhasTabela[linha]
-            && inst->tabuleiro->tabela_numeros[linha][coluna] + inst->soma_acumulada_coluna[coluna] <= inst->tabuleiro->somaColunasTabela[coluna]
-            && !(*acabou))
-            {
-                inst->soma_acumulada_linha[linha] += inst->tabuleiro->tabela_numeros[linha][coluna];
-                inst->soma_acumulada_coluna[coluna] += inst->tabuleiro->tabela_numeros[linha][coluna];
-                inst->tabuleiro->gabarito[linha][coluna] = 1;
-
-                EncontraGabarito(inst, linha, coluna+1, acabou);
-                EncontraGabarito(inst, linha+1, coluna, acabou);
-
-                inst->soma_acumulada_linha[linha] -= inst->tabuleiro->tabela_numeros[linha][coluna];
-                inst->soma_acumulada_coluna[coluna] -= inst->tabuleiro->tabela_numeros[linha][coluna];
-                inst->tabuleiro->gabarito[linha][coluna] = 0;
-            }
-        }
-    }
-
-    EncontraGabarito(inst, linha+1, coluna, acabou);
-    EncontraGabarito(inst, linha, coluna+1, acabou);
-
-    return;
+    return true;
 }
 
 
-void ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
+void EncontraGabarito(Encontra_gabarito_t *inst, int posicao, bool *acabou)
 {
-	CarregarJogoSalvo(tabuleiro, jogador);
+    // Copia o tamanho do tabuleiro
+    int n = inst->tabuleiro->tamanho;
+
+    // Se ja encontrou uma solução, retorna
+    if (*acabou)
+        return;
+
+    // Se ja chegou na ultima posucao
+    if (posicao == n * n)
+    {
+        if(VerificaGabarito(inst))
+            *acabou = true;
+            
+        return;
+    }
+
+    // Obtem a linha e a coluna
+    int i = posicao / n;
+    int j = posicao % n;
+
+    
+    int valor = inst->tabuleiro->tabela_numeros[i][j];
+
+    // ========= Obtendo limitante por linha =========
+    // Somas minimas e maximas por linha
+    int soma_min_linha = 0;
+    int soma_max_linha = 0;
+
+    // A partir da coluna j, itera ate o final da linha
+    for (int k = j; k < n; k++)
+    {
+        int v = inst->tabuleiro->tabela_numeros[i][k];
+        if (v > 0)
+            soma_max_linha += v;
+        else
+            soma_min_linha += v;
+    }
+
+    // Copia a soma já acumulada
+    int atual_linha = inst->soma_acumulada_linha[i];
+    // Copia a soma real (alvo)
+    int alvo_linha = inst->tabuleiro->somaLinhasTabela[i];
+
+    // Se a soma atual da linha + minimo ultrapassa o valor da soma real ou 
+    // soma atual da linha + max não atinge o valor da soma real, retorna
+    if (atual_linha + soma_min_linha > alvo_linha ||
+        atual_linha + soma_max_linha < alvo_linha)
+        return;
+
+    // ========= Obtendo limitante por coluna =========
+    // Somas minimas e maximas por coluna
+    int soma_min_coluna = 0;
+    int soma_max_coluna = 0;
+
+    // A partir da coluna i, itera ate o final da coluna
+    for (int k = i; k < n; k++)
+    {
+        int v = inst->tabuleiro->tabela_numeros[k][j];
+        if (v > 0)
+            soma_max_coluna += v;
+        else
+            soma_min_coluna += v;
+    }
+
+    // Copia a soma já acumulada
+    int atual_coluna = inst->soma_acumulada_coluna[j];
+    // Copia a soma real (alvo)
+    int alvo_coluna = inst->tabuleiro->somaColunasTabela[j];
+
+    // Se a soma atual da coluna + minimo ultrapassa o valor da soma real ou 
+    // soma atual da coluna + max não atinge o valor da soma real, retorna
+    if (atual_coluna + soma_min_coluna > alvo_coluna ||
+        atual_coluna + soma_max_coluna < alvo_coluna)
+        return;
+
+    // tenta inserir 1 e realiza as somas
+    inst->tabuleiro->gabarito[i][j] = 1;
+    inst->soma_acumulada_linha[i] += valor;
+    inst->soma_acumulada_coluna[j] += valor;
+
+    EncontraGabarito(inst, posicao + 1, acabou);
+
+    // Desfaz as somas
+    inst->soma_acumulada_linha[i] -= valor;
+    inst->soma_acumulada_coluna[j] -= valor;
+
+    // Se ainda não encontrou uma solução, insere 0
+    if (!(*acabou))
+    {
+        inst->tabuleiro->gabarito[i][j] = 0;
+        EncontraGabarito(inst, posicao + 1, acabou);
+    }
+
+    // Se já encontrou a solução, retorna
+    return;
+}
+
+void RecalculaDicas(Tabuleiro_t *tabuleiro, int *contadicas)
+{
+    tabuleiro->max_dicas = 0;
+    for (int i = 0; i < tabuleiro->tamanho; i++)
+	{
+		for (int j = 0; j < tabuleiro->tamanho; j++)
+		{
+			// Se no gabarito o valor deve ser mantido, o jogador tem direito a uma dica para aquele número
+			if(tabuleiro->gabarito[i][j] == 1)
+            {
+                tabuleiro->max_dicas++;
+                if(tabuleiro->tabela_usuario[i][j] == 1)
+                    (*contadicas)++;
+            }
+		}
+	}
+}
+
+
+bool ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
+{
+    // Caso tenha algum erro ao carregar o jogo salvo ou o jogador escolheu voltar ao menu
+	if(!CarregarJogoSalvo(tabuleiro, jogador))
+        return false;
 
     #if DEBUG
         // Debug_str("\nDEBUG DO JOGO\n");
@@ -253,48 +342,66 @@ void ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 
     #endif
     
+    // Strings que serao utilizadas para receber comandos
     char entrada_usuario[MAX_STRING];
 	char comando_arg1[MAX_STRING/2];
 	char comando_arg2[MAX_STRING/2];
+    // Flag que define se um gabarito foi encontrado
     bool possui_gabarito = false;
+    // Flag que define se o usuario usou o comando resolver
     bool usou_resolver = false;
 
     // Variável que irá contar quantas dicas já foram dadas
     int contadicas = 0;
 
-    // Mostra o tabuleiro para o jogador
-	ExibirTabuleiro(tabuleiro);
-
-    Acha_gabarito_t instancia_gabarito = {0};
+    // Criando a instância da estrutura que procura um gabarito
+    Encontra_gabarito_t instancia_gabarito = {0};
     instancia_gabarito.tabuleiro = tabuleiro;
     instancia_gabarito.soma_acumulada_linha = calloc(tabuleiro->tamanho, sizeof(int));
     instancia_gabarito.soma_acumulada_coluna = calloc(tabuleiro->tamanho, sizeof(int));
     
+    printf(BOLD(RED("\nEncontrando solução! Aguarde...\n\n")));
+    
     // Função que econtra um gabarito
-    EncontraGabarito(&instancia_gabarito, 0, 0, &possui_gabarito);
-
+    EncontraGabarito(&instancia_gabarito, 0, &possui_gabarito);
+    
+    // Liberando a estrutura
     free(instancia_gabarito.soma_acumulada_linha);
     free(instancia_gabarito.soma_acumulada_coluna);
 
+    // Se não existe nenhum gabarito, retorna false
     if(possui_gabarito == false)
     {
-        printError("\nO jogo não possui solução!.\n");
-        return;
+        printError("O jogo não possui solução!.\n");
+        return false;
+
     }
 
+    // Caso contrário, mostra que encontrou uma solução
+    printf(BOLD(GREEN("Solução Encontrada!\n\n")));
+    
+    // Recalcula as dicas (contador e máxima) conforme o gabarito encontrado
+    RecalculaDicas(tabuleiro, &contadicas);
+    
+    // Mostra o tabuleiro para o jogador
+	ExibirTabuleiro(tabuleiro);
+
     // Comeca a contar o tempo do jogo
-	time_t tempo_ini = time(NULL);
-    tempo_ini += jogador->tempo;
+	time_t tempo_ini = time(NULL) - jogador->tempo;
     limpabuffer();
 
+    // Enquanto o jogador não tiver ganhado, repete o loop de comandos
     while (JogadorGanhou(tabuleiro) == false)
 	{
+        // Obtem e valida a entrada do usuario
 		while(fgets(entrada_usuario, sizeof(entrada_usuario), stdin) == NULL)
 		{
 			printError("\nComando inválido! Digite um comando válido: ");
 		}
+        // Separando o comando em 2 argumentos
 		sscanf(entrada_usuario,"%s %s", comando_arg1, comando_arg2);
 
+        // Obtendo o numero correspondente ao comando
 		int num_comando = ComandoParaNumero(comando_arg1);
 
 		switch (num_comando)
@@ -302,8 +409,8 @@ void ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 			// Comando Resolver
 			case 1:
 				Resolver(tabuleiro, jogador, tempo_ini);
-				*acao = 0;
                 usou_resolver = true;
+				*acao = 0;
 				break;
 			
 			// Comando dica
@@ -313,7 +420,7 @@ void ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 
 			// Comando Manter
 			case 3:
-				Manter(tabuleiro, comando_arg2);
+				Manter(tabuleiro, comando_arg2, &contadicas);
 				break;
 
 			// Comando Salvar
@@ -324,8 +431,9 @@ void ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 			// Comando Voltar
 			case 5:
 				Voltar(tabuleiro, acao);
+                // Se o jogador optou por sair do jogo, iniciar um jogo novo ou continuar jogo salvo, libera a memoria e retorna falso
 				if(*acao == 0 || *acao == 1 || *acao == 2) 
-					return;
+					return false;
 				break;
 				
 			// Remover
@@ -339,9 +447,10 @@ void ContinuarJogo(Tabuleiro_t *tabuleiro, Jogador_t *jogador, int *acao)
 				break;
 		}
 	}
-	TelaDeFim(jogador, tempo_ini, usou_resolver);
+    // Exibe a tela de fim de jogo
+	TelaDeFim(jogador, tempo_ini, usou_resolver, tabuleiro->dificuldade);
+    // Libera a memória
 	liberaTabuleiro(tabuleiro);
-	*acao = 0;
-
-	return;
+    // Retorna true se o jogador resolveu o jogo
+	return true;
 }

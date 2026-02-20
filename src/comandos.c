@@ -1,11 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include "jogo.h"
 #include "comandos.h"
-#include "interface.h"
-#include "auxiliares.h"
+#include "carregarjogo.h"
 
 void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t tempo_ini)
 {
@@ -14,7 +8,7 @@ void Resolver(Tabuleiro_t *tabuleiro, Jogador_t *jogador, time_t tempo_ini)
         tabuleiro->somaLinhasUsuario[i] = 0;
         tabuleiro->somaColunasUsuario[i] = 0;
     }    
-    
+    // Igualando o gabarito com a matriz do usuario
     for(int i = 0; i < tabuleiro->tamanho; i++)
     {
         for(int j = 0; j < tabuleiro->tamanho; j++)
@@ -47,18 +41,23 @@ void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
     }
     else
     {
-        while (dica_encontrada != true)
+        // Enquanto não encontrar uma dica, sorteia uma dica aleatória
+        while (dica_encontrada == false)
         {
             linha = rand() % tabuleiro->tamanho;
-            coluna = rand() % tabuleiro->tamanho;            
+            coluna = rand() % tabuleiro->tamanho;
+            // Se o elemento deve ser mantido, mas o jogador não manteve
             if(tabuleiro->gabarito[linha][coluna] == true && tabuleiro->tabela_usuario[linha][coluna] != 2)
             {
+                if(tabuleiro->tabela_usuario[linha][coluna] == 0){
+                    tabuleiro->somaLinhasUsuario[linha] += tabuleiro->tabela_numeros[linha][coluna];
+                    tabuleiro->somaColunasUsuario[coluna] += tabuleiro->tabela_numeros[linha][coluna];
+                }
                 tabuleiro->tabela_usuario[linha][coluna] = 2;
                 dica_encontrada = true;
                 (*contadicas)++;
             }
         }
-            
     }        
     // Imprime a dica revelada
     printf(RED("\n\nDICA REVELADA: "));
@@ -73,52 +72,36 @@ void Dica(Tabuleiro_t *tabuleiro, int *contadicas)
 //Função que salva o jogo atual e os dados do jogador
 void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *nome_do_save, time_t tempo_ini)
 {
-    if(nome_do_save[6] == '\n')
+    
+    // Validando o formato do texto
+
+    int tam_nome = strlen(nome_do_save);
+    if(nome_do_save[tam_nome-1] != 't' || nome_do_save[tam_nome-2] != 'x' || nome_do_save[tam_nome-3] != 't' || nome_do_save[tam_nome-4] != '.')
     {
-        printf("\n\nFormato ");
-        printf(RED("NÃO"));
-        printf(" suportado! Digite o nome do arquivo.txt\n\n");
+        printError("\nFormato de nome de save inválido! O nome do save deve ser no formato \"nome_do_save.txt\".\n");
+        return;
     }
 
-    else
-    {
-        // Validando o formato do texto
-        int t = 0;
-        while(nome_do_save[t] != '.')
-            t++;
-
-        if(nome_do_save[t+1] != 't' || nome_do_save[t+2] != 'x' || nome_do_save[t+3] != 't' || nome_do_save[t] != '.')
-        {
-            printf("\n\nFormato ");
-            printf(RED("NÃO"));
-            printf(" suportado! Digite o nome do arquivo.txt\n\n");
-            return;
-        }
-
-        time_t tempo_fim = time(NULL);
-        jogador->tempo = tempo_fim - tempo_ini;
-    }
+    time_t tempo_fim = time(NULL);
+    jogador->tempo = tempo_fim - tempo_ini;
 
     // String que conterá o nome do save do jogador
-    char nomesave[MAX_STRING]; 
-    int i = 0, manterCount = 0, removerCount = 0;
-    do
-    {
-        nomesave[i] = nome_do_save[i+7];
-        i++;
-    }
-    while(nome_do_save[i+7] != '\n');
-    nomesave[i] = '\0';
+    char caminho_save[MAX_STRING] = CAMINHO_SAVES; 
+    
+    // Concatenando o caminho do save com o nome do save
+    strcat(caminho_save, nome_do_save);
+
+    int contadorManter = 0, contadorRemover = 0;
 
     // ========== Salvando o jogo em um arquivo de texto ========== //
 
-    FILE *save = fopen(nomesave, "w"); 
+    FILE *save = fopen(caminho_save, "w"); 
 
     // Tamanho do tabuleiro que o jogador escolheu
     fprintf(save, "%d\n", jogador->tamanho); 
 
     // Números gerados para o jogador naquela partida
-    for(i = 0; i < tabuleiro->tamanho; i++) 
+    for(int i = 0; i < tabuleiro->tamanho; i++) 
     {
         for(int j = 0; j < tabuleiro->tamanho; j++)
             fprintf(save, "%d ", tabuleiro->tabela_numeros[i][j]);
@@ -126,32 +109,32 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *nome_do_save, time
     }
 
     // Soma das linhas do tabuleiro
-    for(i = 0; i < tabuleiro->tamanho; i++) 
+    for(int i = 0; i < tabuleiro->tamanho; i++) 
         fprintf(save, "%d ", tabuleiro->somaLinhasTabela[i]);
     fprintf(save, "\n");
 
     // Soma das colunas do tabuleiro
-    for(i = 0; i < tabuleiro->tamanho; i++) 
+    for(int i = 0; i < tabuleiro->tamanho; i++) 
         fprintf(save, "%d ", tabuleiro->somaColunasTabela[i]);
     fprintf(save, "\n");
 
     // Contando quantos elementos o jogador manteve e removeu
-    for(i = 0; i < tabuleiro->tamanho; i++) 
+    for(int i = 0; i < tabuleiro->tamanho; i++) 
     {
         for(int j = 0; j < tabuleiro->tamanho; j++)
         {
             if(tabuleiro->tabela_usuario[i][j] == 2)
-                manterCount++;
+                contadorManter++;
             else if(tabuleiro->tabela_usuario[i][j] == 0)
-                removerCount++;
+                contadorRemover++;
         }
     }
 
     // Numero de vezes que o jogador usou o comando manter
-    fprintf(save, "%d\n", manterCount); 
+    fprintf(save, "%d\n", contadorManter); 
 
     // Numeros que o jogador escolheu manter
-    for(i = 0; i < tabuleiro->tamanho; i++) 
+    for(int i = 0; i < tabuleiro->tamanho; i++) 
     {
         for(int j = 0; j < tabuleiro->tamanho; j++)
         if(tabuleiro->tabela_usuario[i][j] == 2)
@@ -160,10 +143,10 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *nome_do_save, time
     }
 
     // Numero de vezes que o jogador usou o comando remover
-    fprintf(save, "%d\n", removerCount); 
+    fprintf(save, "%d\n", contadorRemover); 
 
     // Elementos que o jogador esocolheu remover
-    for(i = 0; i < tabuleiro->tamanho; i++) 
+    for(int i = 0; i < tabuleiro->tamanho; i++) 
     {
         for(int j = 0; j < tabuleiro->tamanho; j++)
         if(tabuleiro->tabela_usuario[i][j] == 0)
@@ -176,38 +159,43 @@ void Salvar(Tabuleiro_t *tabuleiro, Jogador_t *jogador, char *nome_do_save, time
     fprintf(save, "%s\n", jogador->nome); 
 
     // Tempo gasto pelo jogador
-    fprintf(save, "%ld", jogador->tempo); 
+    fprintf(save, "%ld\n", jogador->tempo); 
+
+    // Dificuldade escolhida
+    fprintf(save, "%c", tabuleiro->dificuldade); 
 
     // Fecha o arquivo
     fclose(save);
 
     // Imprime mensagem de sucesso
-    printf(YELLOW("\nJogo salvo como "));
-    int t = 0;
-    do
-    {
-        printf(RED("%c"), nome_do_save[t+7]);
-        t++;
-    }
-    while(nome_do_save[t+7] != '\n');
-    nome_do_save[t+7] = '\0';
-    printf(YELLOW(" com sucesso!\n\n"));
+    printf(YELLOW("\nJogo salvo em %s como \"%s\"!\n\n"), CAMINHO_SAVES, nome_do_save);
 
     return;
 }
 
 void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, int *acao)
 {
+    // Obtendo as posicoes de linha e coluna em inteiros
     int linha = (elemento_removido[0] - '0') - 1;
     int coluna = (elemento_removido[1] - '0') - 1;
     
+    // Validacao se o elemento existe
     if(elemento_removido[2] != '\0' || linha+1 > tabuleiro->tamanho || linha+1 < 1 
         || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)
     {
-        printError("\nEsse elemento não existe! Remova um elemento váldo: ");
+        printError("\nEsse elemento não existe! Remova um elemento váldo:\n");
         return;
     }
 
+    // Se o elemento ja foi removido
+    if(tabuleiro->tabela_usuario[linha][coluna] == 0)
+    {
+        ExibirTabuleiro(tabuleiro);
+        printf(YELLOW("Esse elemento já foi removido!\n"));
+        return;
+    }
+
+    // Atualizando a matriz do usuario, soma de linhas e colunas
     tabuleiro->tabela_usuario[linha][coluna] = 0;
     tabuleiro->somaLinhasUsuario[linha] -= tabuleiro->tabela_numeros[linha][coluna];
     tabuleiro->somaColunasUsuario[coluna] -= tabuleiro->tabela_numeros[linha][coluna];
@@ -215,7 +203,7 @@ void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, i
     if(tabuleiro->tabela_usuario[linha][coluna] == 0 && tabuleiro->gabarito[linha][coluna] == 1)
         (*contadicas)--;
     
-    // Confere se o jogador ganhou o jogo naquele momento
+    // Confere se o jogador ganhou nessa jogada
     if(JogadorGanhou(tabuleiro) == false) 
     {
         ExibirTabuleiro(tabuleiro);
@@ -240,16 +228,15 @@ void Remover(Tabuleiro_t *tabuleiro, char *elemento_removido, int *contadicas, i
 void Voltar(Tabuleiro_t *tabuleiro, int *acao)
 {
     MenuVoltar();
-    scanf("%d", acao);
-    limpabuffer();
 
-    while(*acao < 0 || *acao > 4)
+    // Validação do comando
+    while(scanf("%d", acao) == 0 || *acao < 0 || *acao > 4)
     {
         printError("\n\nComando inválido! Digite um número de 0 a 4: ");
-        scanf("%d", acao);
         limpabuffer();
+        
     }
-    
+    // Se a acao for imprimir o ranking
     if(*acao == 3)
     {
         printf("\n\n");
@@ -258,6 +245,7 @@ void Voltar(Tabuleiro_t *tabuleiro, int *acao)
         printf("\n\n");
         return;
     }
+    // Se a acao for voltar ao jogo
     else if(*acao == 4)
     {
         ExibirTabuleiro(tabuleiro);
@@ -265,6 +253,7 @@ void Voltar(Tabuleiro_t *tabuleiro, int *acao)
         limpabuffer();
         return;
     }
+    // Se a acao for sair do jogo ou começar novo jogo ou carregar jogo, desaloca o tabuleiro
     else{
         liberaTabuleiro(tabuleiro);
     }
@@ -272,21 +261,37 @@ void Voltar(Tabuleiro_t *tabuleiro, int *acao)
     return;
 }
 
-void Manter(Tabuleiro_t *tabuleiro, char *elemento_mantido)
+void Manter(Tabuleiro_t *tabuleiro, char *elemento_mantido, int *contadicas)
 {
-    // Aritimética que transforma char para int
+    // Obtendo as posicoes de linha e coluna em inteiros
     int linha = (elemento_mantido[0] - '0') - 1; 
     int coluna = (elemento_mantido[1] - '0') - 1;
 
     // Mais uma validação de manter
     if(elemento_mantido[2] != '\0' || linha+1 > tabuleiro->tamanho || linha+1 < 1 || coluna+1 > tabuleiro->tamanho || coluna+1 < 1)
     {
-        printError("\n\nEsse elemento não existe! Mantenha um elemento váldo:\n\n");
+        printError("\nEsse elemento não existe! Mantenha um elemento váldo.\n");
         return;
     }
 
+    // Se o elemento ja foi mantido
+    if(tabuleiro->tabela_usuario[linha][coluna] == 2)
+    {
+        ExibirTabuleiro(tabuleiro);
+        printf(YELLOW("\nEsse elemento já foi mantido!\n"));
+        return;
+    }
+
+    if(tabuleiro->tabela_usuario[linha][coluna] == 0)
+    {
+        tabuleiro->somaLinhasUsuario[linha] += tabuleiro->tabela_numeros[linha][coluna];
+        tabuleiro->somaColunasUsuario[coluna] += tabuleiro->tabela_numeros[linha][coluna];
+    }
+
     tabuleiro->tabela_usuario[linha][coluna] = 2;
-    tabuleiro->somaLinhasUsuario[linha] += tabuleiro->tabela_numeros[linha][coluna];
-    tabuleiro->somaColunasUsuario[coluna] += tabuleiro->tabela_numeros[linha][coluna];
+
+    if(tabuleiro->tabela_usuario[linha][coluna] == 2 && tabuleiro->gabarito[linha][coluna] == 1)
+        (*contadicas)++;
+
     ExibirTabuleiro(tabuleiro);
 }

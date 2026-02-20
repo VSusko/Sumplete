@@ -1,7 +1,6 @@
 #include "interface.h"
-#include "jogo.h"
+#include "novojogo.h"
 
-// Função que imprime os comandos do jogo
 void ExibirComandos()
 {
 	printf(BOLD(YELLOW("\n\nComandos:")));
@@ -35,6 +34,8 @@ void ValidaNomeArquivo(char *nome_do_arquivo)
 	while (scanf("%s", nome_do_arquivo) == 0)
     {
         int tamanho_nome = strlen(nome_do_arquivo);
+		if(!strcmp(nome_do_arquivo, "0"))
+			return;
         if(nome_do_arquivo[tamanho_nome-1] != 't' || nome_do_arquivo[tamanho_nome-2] != 'x' || nome_do_arquivo[tamanho_nome-3] != 't' || nome_do_arquivo[tamanho_nome-4] != '.'){   
             printError("\nFormato NÃO suportado! Digite o nome do arquivo.txt: ");
         }
@@ -45,7 +46,6 @@ void ValidaNomeArquivo(char *nome_do_arquivo)
     }
 }
 
-// Função responsável por imprimir um jogo, recebe uma variavel do tipo tabuleiro
 void ExibirTabuleiro(Tabuleiro_t *tabuleiro)
 {
 	#if DEBUG
@@ -54,8 +54,6 @@ void ExibirTabuleiro(Tabuleiro_t *tabuleiro)
 		// 	printf("%d ", tabuleiro->somaLinhasUsuario[i]);
 		// }
 		// printf("\n");
-
-
 
 		// printf("Soma das colunas do tabuleiro: ");
 		// for(int i = 0; i < tabuleiro->tamanho; i++){
@@ -233,7 +231,6 @@ void ExibirTabuleiro(Tabuleiro_t *tabuleiro)
 	ExibirComandos();
 }
 
-// Função Menu
 void Menu()
 {
 	printf(YELLOW("\n BEM VINDO AO "));
@@ -259,16 +256,33 @@ void MenuVoltar()
 	printf(YELLOW("\n\nDurante o jogo digite "));printf(RED("“voltar”"));printf(YELLOW(" para retornar ao menu.\n\n"));
 }
 
-void TelaDeFim(Jogador_t *jogador, time_t tempo_ini, bool usou_resolver)
+void TelaDeFim(Jogador_t *jogador, time_t tempo_ini, bool usou_resolver, char dificuldade)
 {
 	time_t tempo_fim = time(NULL);
-	jogador->tempo = tempo_fim - tempo_ini; // coleta do tempo do jogador
+	int base = 1000;
+
+	jogador->tempo = tempo_fim - tempo_ini;
+
+	if(dificuldade == 'm' || dificuldade == 'M')
+		jogador->pontuacao = (base*2) / (jogador->tempo+1);
+	if(dificuldade == 'd' || dificuldade == 'D')
+		jogador->pontuacao = (base*3) / (jogador->tempo+1);
+	else
+		jogador->pontuacao = base / (jogador->tempo+1);
+
+	if(usou_resolver)
+		jogador->pontuacao = 0;
+		
 	printf(CYAN("\nFIM DE JOGO!!\n"));
 	printf("\nTempo gasto pelo jogador ");
 	printf(BOLD(YELLOW("%s")), jogador->nome);
 	printf(": ");
 	printf(MAGENTA("%ld"), jogador->tempo);
-	printf(" segundos.\n\n\n");
+	printf(" segundos.\n");
+	
+	printf("Pontuação obtida: ");
+	printf(MAGENTA("%ld\n\n\n"), jogador->pontuacao);
+
 
 	if(usou_resolver)
 	{
@@ -313,111 +327,6 @@ void MenuJogarNovamente(int *acao)
 	return;
 }
 
-
-void ImprimirCabecalhoRanking()
-{
-	ImprimeTabTela(TAB_TELA);
-	printf("\t" TAB_TL);
-	for (int i = 0; i < 23; i++)
-	{
-		if (i % 2 == 0)
-			printf(MAGENTA(TAB_HOR));
-		else
-			printf(TAB_HOR);
-	}
-	printf(TAB_TR "\n");
-	ImprimeTabTela(TAB_TELA);
-	printf("\t" TAB_VER BLUE(" RANKING DOS JOGADORES ") TAB_VER);
-	printf("\n");
-	ImprimeTabTela(TAB_TELA);
-	printf("\t" TAB_BL);
-	for (int i = 0; i < 23; i++)
-	{
-		if (i % 2 == 0)
-			printf(MAGENTA(TAB_HOR));
-		else
-			printf(TAB_HOR);
-	}
-	printf(TAB_BR "\n");
-
-}
-
-// Função que apenas imprime o rank do arquivo "sumplete.ini"
-void ExibirRanking()
-{
-	FILE *arquivo = fopen(RANKING_PATH, "r");
-	if (arquivo == NULL)
-	{
-		printError("\nO arquivo \"sumplete.ini\" não existe!\n");
-		return;
-	}
-
-	char linha[MAX_STRING];
-	char arg1[MAX_STRING/2];
-	char arg2[MAX_STRING/2];
-
-	bool primeiroSize = true;
-
-	ImprimirCabecalhoRanking();
-
-	while (fgets(linha, sizeof(linha), arquivo) != NULL)
-	{
-		if (sscanf(linha, "%s = %s", arg1, arg2) != 2)
-			continue;
-
-		if (strcmp(arg1, "size") == 0)
-		{
-			if (!primeiroSize)
-				printf("\n");  // espaço apenas entre categorias
-
-			printf(_PURPLE("size = %s\n"), arg2);
-			primeiroSize = false;
-		}
-		else if (strncmp(arg1, "player", 6) == 0)
-		{
-			int numero;
-			sscanf(arg1, "player%d", &numero);
-			printf(_LIGHT_PURPLE("player%d = %s\n"), numero, arg2);
-		}
-		else if (strncmp(arg1, "time", 4) == 0)
-		{
-			int numero;
-			sscanf(arg1, "time%d", &numero);
-			printf(_LIGHT_PURPLE("time%d = %s\n"), numero, arg2);
-		}
-	}
-
-	fclose(arquivo);
-}
-
-
-void ExibirRankingFim(Ranking_t *construtor_ranking, Jogador_t *jogador)
-{
-	ImprimirCabecalhoRanking();
-
-	for (int i = 0; i < NUMERO_DE_TABULEIROS; i++)
-	{
-		// Caso não tenha jogadores numa categoria, pular para a próxima
-		if (construtor_ranking->num_jogadores_por_categoria[i] == 0)
-			continue;
-
-		printf(_PURPLE("\nsize = %d\n"), i + 3);
-		for (int j = 0; j < construtor_ranking->num_jogadores_por_categoria[i]; j++)
-		{
-			if (jogadoresSaoIguais(*jogador, construtor_ranking->ranking[i][j]))
-			{
-				printf(_CYAN("SUA COLOCAÇÃO:\n"));
-				printf(_CYAN("player%d = %s\n"), j + 1, construtor_ranking->ranking[i][j].nome);
-				printf(_CYAN("time%d = %ld\n"), j + 1, construtor_ranking->ranking[i][j].tempo);
-			}
-			else
-			{
-				printf(_LIGHT_PURPLE("player%d = %s\n"), j + 1, construtor_ranking->ranking[i][j].nome);
-				printf(_LIGHT_PURPLE("time%d = %ld\n"), j + 1, construtor_ranking->ranking[i][j].tempo);
-			}
-		}
-	}
-}
 
 void ImprimirSelecaoDificuldade(int tamanho_tabuleiro)
 {

@@ -1,4 +1,4 @@
-#include "jogo.h"
+#include "novojogo.h"
 #include "auxiliares.h"
 #include "comandos.h"
 #include "interface.h"
@@ -26,16 +26,18 @@ int main()
 		{
 			// Começar um novo jogo
 			case 1:
-				ComecarNovoJogo(&tabuleiro, &jogador, &acao);
-				if(acao != 0)
+				if(NovoJogo(&tabuleiro, &jogador, &acao))
 					MenuJogarNovamente(&acao);
 				break;
 			
 			// Carregar jogo salvo
 			case 2:
-				ContinuarJogo(&tabuleiro, &jogador, &acao);
-				if(acao != 0)
+				if(ContinuarJogo(&tabuleiro, &jogador, &acao))
 					MenuJogarNovamente(&acao);
+				else{
+					Menu();
+					Valida_acao(&acao);
+				}
 				break;
 
 			// Exibir Ranking
